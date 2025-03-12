@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 function Header(props) {
   const navigate = useNavigate();
   return (
-    <header className="h-[100px] flex items-center justify-between">
+    <header className="min-h-[100px] flex items-center justify-between">
       <aside className="flex items-center gap-1">
         <span className="text-[31px] text-[#8338ec] font-bold">Momentum</span>
         <img src="./Hourglass.png" alt="sand timer" />

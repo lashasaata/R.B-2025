@@ -44,3 +44,28 @@ header {
 .blur {
   background-color: rgba(13, 15, 16, 0.15);
 }
+
+.form2labels {
+  font-size: 14px;
+  line-height: 17px;
+  color: #343a40;
+  font-weight: 500;
+}
+
+.form2spans {
+  font-size: 10px;
+  line-height: 12px;
+  color: #6c757d;
+  font-weight: 400;
+}
+
+.form2inputs {
+  height: 42px;
+  width: 384px;
+  border-radius: 6px;
+  padding: 10px;
+  border: 1px solid #ced4da;
+  background-color: #fff;
+  outline: none;
+  appearance: none;
+}
