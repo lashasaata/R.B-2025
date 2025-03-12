@@ -5,7 +5,7 @@ import CreateTask from "./pages/createtask";
 
 function App() {
   return (
-    <main className="w-full h-screen flex flex-col gap-10 px-[130px]">
+    <main className="w-full h-screen flex flex-col gap-10 px-[120px]">
       <BrowserRouter>
         <Header />
         <Routes>

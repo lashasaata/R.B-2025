@@ -13,3 +13,30 @@
 header {
   font-family: "Fredoka", sans-serif;
 }
+
+.form1 {
+  background-color: rgba(251, 249, 255, 0.65);
+}
+
+.formlabels {
+  font-size: 16px;
+  line-height: 19px;
+  color: #343a40;
+}
+
+.formspans {
+  font-size: 10px;
+  line-height: 12px;
+  margin-left: 1px;
+  color: #6c757d;
+}
+
+.forminputs {
+  border-radius: 5px;
+  border-width: 1px;
+  border-style: solid;
+  border-color: #dee2e6;
+  padding: 14px;
+  background-color: #fff;
+  outline: none;
+}
