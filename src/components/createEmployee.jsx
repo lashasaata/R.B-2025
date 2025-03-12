@@ -1,13 +1,60 @@
-function CreateEmployee() {
+import { useNavigate } from "react-router-dom";
+import { useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import * as yup from "yup";
+import axios from "axios";
+
+const schema = yup.object().shape({
+  name: yup
+    .string()
+    .required("სავალდებულო")
+    .min(2, " მინიმუმ 2 სიმბოლო")
+    .max(255, "მაქსიმუმ 255 სიმბოლო"),
+  lastname: yup
+    .string()
+    .required("სავალდებულო")
+    .min(2, " მინიმუმ 2 სიმბოლო")
+    .max(255, "მაქსიმუმ 255 სიმბოლო"),
+  department1: yup.string().required(),
+});
+
+function CreateEmployee(props) {
+  const navigate = useNavigate();
+
+  const {
+    register,
+    handleSubmit,
+    watch,
+    setValue,
+    formState: { errors },
+  } = useForm({
+    resolver: yupResolver(schema),
+  });
+
+  const onSubmt = (data) => {};
+
   return (
-    <div className="fixed bg-black inset-0 backdrop-blur-[5px]">
+    <div
+      onClick={() => props.setSlicer(false)}
+      className="fixed bg-black inset-0 backdrop-blur-[5px]"
+    >
       <main className="w-[913px] rounded-[10px] bg-[#fff] flex flex-col gap-[37px] mt-[118px] ml-[580px] px-[50px] pt-10 pb-15">
         <div className="flex justify-end">
           <div>
-            <img src="./Cancel.png" alt="cancle" />
+            <img
+              src="./Cancel.png"
+              alt="cancle"
+              className="cursor-pointer"
+              onClick={() => {
+                props.setSlicer(false);
+              }}
+            />
           </div>
         </div>
-        <form className="flex flex-col gap-[45px]">
+        <form
+          onSubmit={handleSubmit(onSubmt)}
+          className="flex flex-col gap-[45px]"
+        >
           <h1 className="text-[32px] text-[#212529] font-bold leading-[38px] text-center">
             თანამშრომლის დამატება
           </h1>
@@ -16,7 +63,12 @@ function CreateEmployee() {
               <label htmlFor="name" className="form2labels">
                 სახელი*
               </label>
-              <input type="text" id="name" className="form2inputs" />
+              <input
+                {...register("name")}
+                type="text"
+                id="name"
+                className="form2inputs"
+              />
               <div className="flex flex-col gap-[2px] mt-[3px]">
                 <p className="flex items-center gap-[2px]">
                   <img src="./check.png" alt="check" />
@@ -32,7 +84,12 @@ function CreateEmployee() {
               <label htmlFor="lastname" className="form2labels">
                 გვარი*
               </label>
-              <input type="text" id="lastname" className="form2inputs" />
+              <input
+                {...register("lastname")}
+                type="text"
+                id="lastname"
+                className="form2inputs"
+              />
               <div className="flex flex-col gap-[2px] mt-[3px]">
                 <p className="flex items-center gap-[2px]">
                   <img src="./check.png" alt="check" />
@@ -68,16 +125,35 @@ function CreateEmployee() {
                 </div>
               </label>
             </div>
-            <input type="file" name="" id="image_upload" className="hidden" />
+            <input
+              {...register("image_upload")}
+              type="file"
+              accept="image/*"
+              name=""
+              id="image_upload"
+              className="hidden"
+            />
           </div>
           <div className="flex flex-col gap-[3px]">
             <label htmlFor="department1" className="form2labels">
               დეპარტამენტი*
             </label>
-            <select name="" id="department1" className="form2inputs"></select>
+            <select
+              {...register("department1")}
+              name=""
+              id="department1"
+              className="form2inputs"
+            ></select>
           </div>
           <div className="flex justify-end gap-[22px]">
-            <button className="w-[102px] h-[42px] flex items-center justify-center rounded-[5px] border border-solid border-[#8338ec] text-base text-[#212529] cursor-pointer hover:border-[#B588F4]">
+            <button
+              className="w-[102px] h-[42px] flex items-center justify-center rounded-[5px] border border-solid border-[#8338ec] text-base text-[#212529] cursor-pointer hover:border-[#B588F4]
+            "
+              onClick={(e) => {
+                e.preventDefault;
+                props.setSlicer(false);
+              }}
+            >
               გაუქმება
             </button>
             <button

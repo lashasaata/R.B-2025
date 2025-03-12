@@ -10,9 +10,10 @@ function App() {
   return (
     <main className="w-full h-screen flex flex-col gap-10 px-[120px] relative">
       <BrowserRouter>
-        <Header useSlicer={useSlicer} setSlicer={setSlicer} />
-        {useSlicer ? <CreateEmployee /> : <></>}
+        <Header setSlicer={setSlicer} />
+        {useSlicer ? <CreateEmployee setSlicer={setSlicer} /> : <></>}
         <Routes>
+          <Route path="/" />
           <Route path="/create_task" element={<CreateTask />} />
         </Routes>
       </BrowserRouter>
