@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 
-function Header() {
+function Header(props) {
   const navigate = useNavigate();
   return (
     <header className="h-[100px] flex items-center justify-between">
@@ -9,7 +9,10 @@ function Header() {
         <img src="./Hourglass.png" alt="sand timer" />
       </aside>
       <nav className="flex items-center gap-10">
-        <button className="w-[225px] h-[39px] flex items-center justify-center rounded-[5px] border border-solid border-[#8338ec] text-base text-[#212529] cursor-pointer hover:border-[#B588F4]">
+        <button
+          className="w-[225px] h-[39px] flex items-center justify-center rounded-[5px] border border-solid border-[#8338ec] text-base text-[#212529] cursor-pointer hover:border-[#B588F4]"
+          onClick={() => props.setSlicer(!props.useSlicer)}
+        >
           თანამშრომლის შექმნა
         </button>
         <button
