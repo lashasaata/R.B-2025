@@ -16,13 +16,13 @@ const schema = yup.object().shape({
     .matches(/^[a-zA-Zა-ჰ]+$/, "მხოლოდ ქართული და ლათინური ასოები!")
     .min(2, " მინიმუმ 2 სიმბოლო")
     .max(255, "მაქსიმუმ 255 სიმბოლო"),
-  lastname: yup
+  surname: yup
     .string()
     .required("სავალდებულო")
     .matches(/^[a-zA-Zა-ჰ]+$/, "მხოლოდ ქართული და ლათინური ასოები!")
     .min(2, " მინიმუმ 2 სიმბოლო")
     .max(255, "მაქსიმუმ 255 სიმბოლო"),
-  image_upload: yup
+  avatar: yup
     .mixed()
     .test("fileRequired", "ფოტო სავალდებულოა", (value) => {
       // return value && value.length > 0;
@@ -35,12 +35,14 @@ const schema = yup.object().shape({
       return SUPPORTED_FORMATS.includes(value.type);
     }),
 
-  department1: yup.string().required(),
+  department_id: yup.string().required(),
 });
 
 function CreateEmployee(props) {
   const navigate = useNavigate();
   const depUrl = "https://momentum.redberryinternship.ge/api/departments";
+  const emplUrl = "https://momentum.redberryinternship.ge/api/employees";
+  const token = "9e6c9438-0bca-4337-a267-f9a7fd99f68b";
   const [fileA, setFileA] = useState("");
   const [fileAUrl, setFileAUrl] = useState("");
   const [departments, setDepartments] = useState([]);
@@ -68,7 +70,31 @@ function CreateEmployee(props) {
     resolver: yupResolver(schema),
   });
 
-  const onSubmt = (data) => {};
+  const onSubmt = (data) => {
+    const depId = departments.find((e) => e.name === data.department_id).id;
+
+    const formData = new FormData();
+    formData.append("name", data.name);
+    formData.append("surname", data.surname);
+    formData.append("avatar", fileA);
+    formData.append("name", depId);
+
+    const postData = async () => {
+      try {
+        const response = await axios.post(emplUrl, formData, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            Accept: "application/json",
+            "Content-Type": "multipart/form-data",
+          },
+        });
+      } catch (error) {
+        console.log("Error posting data:", error);
+      }
+    };
+    postData();
+    props.setSlicer(false);
+  };
 
   const inputs = watch();
   console.log(inputs);
@@ -105,21 +131,20 @@ function CreateEmployee(props) {
       setFileAUrl(url);
     }
     console.log(e.target.value);
-    setValue("image_upload", selectedFile, { shouldValidate: true });
+    setValue("avatar", selectedFile, { shouldValidate: true });
   };
 
   const handleClearFileA = () => {
     setFileA("");
     setFileAUrl("");
-    setValue("image_upload", "", { shouldValidate: false });
+    setValue("avatar", "", { shouldValidate: false });
   };
 
   const [selected, setSelected] = useState(departments[0]);
 
   const handleChange = (e) => {
-    console.log(e);
     setSelected(e);
-    setValue("department1", e, { shouldValidate: true }); // Update form
+    setValue("department_id", e, { shouldValidate: true }); // Update form
   };
 
   const [isOpen, setOpen] = useState(false);
@@ -254,19 +279,19 @@ function CreateEmployee(props) {
               </div>
             </section>
             <section className="h-[102px] flex flex-col gap-[3px]">
-              <label htmlFor="lastname" className="form2labels">
+              <label htmlFor="surname" className="form2labels">
                 გვარი*
               </label>
               <input
-                {...register("lastname")}
+                {...register("surname")}
                 type="text"
-                id="lastname"
+                id="surname"
                 className={`${
-                  errors.lastname ? "border-[#F93B1D]" : "border-[#808a93]"
+                  errors.surname ? "border-[#F93B1D]" : "border-[#808a93]"
                 } form2inputs border border-solid`}
               />
               <div className="flex flex-col gap-[2px] mt-[3px]">
-                {errors.lastname && errors.lastname.type == "matches" ? (
+                {errors.surname && errors.surname.type == "matches" ? (
                   <span className="flex items-center gap-[2px] text-[10px] text-[#FA4D4D] leading-[12px]">
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
@@ -275,7 +300,7 @@ function CreateEmployee(props) {
                       fill={`${
                         !(Object.keys(errors).length >= 1)
                           ? "#6C757D"
-                          : errors.lastname && errors.lastname.type == "matches"
+                          : errors.surname && errors.surname.type == "matches"
                           ? "#F93B1D"
                           : "#45A849"
                       }`}
@@ -284,8 +309,8 @@ function CreateEmployee(props) {
                     >
                       <path d="M12.736 3.97a.733.733 0 0 1 1.047 0c.286.289.29.756.01 1.05L7.88 12.01a.733.733 0 0 1-1.065.02L3.217 8.384a.757.757 0 0 1 0-1.06.733.733 0 0 1 1.047 0l3.052 3.093 5.4-6.425z" />
                     </svg>
-                    {errors.lastname && errors.lastname.type == "matches"
-                      ? errors.lastname.message
+                    {errors.surname && errors.surname.type == "matches"
+                      ? errors.surname.message
                       : ""}
                   </span>
                 ) : (
@@ -298,9 +323,9 @@ function CreateEmployee(props) {
                         fill={`${
                           !(Object.keys(errors).length >= 1)
                             ? "#6C757D"
-                            : errors.lastname &&
-                              (errors.lastname.type == "min" ||
-                                errors.lastname?.type == "required")
+                            : errors.surname &&
+                              (errors.surname.type == "min" ||
+                                errors.surname?.type == "required")
                             ? "#F93B1D"
                             : "#45A849"
                         }`}
@@ -313,9 +338,9 @@ function CreateEmployee(props) {
                         className={`${
                           !(Object.keys(errors).length >= 1)
                             ? "text-[#6c757d]"
-                            : errors.lastname &&
-                              (errors.lastname.type == "min" ||
-                                errors.lastname.type == "required")
+                            : errors.surname &&
+                              (errors.surname.type == "min" ||
+                                errors.surname.type == "required")
                             ? "text-[#F93B1D]"
                             : "text-[#45A849]"
                         } form2spans`}
@@ -331,7 +356,7 @@ function CreateEmployee(props) {
                         fill={`${
                           !(Object.keys(errors).length >= 1)
                             ? "#6C757D"
-                            : errors.lastname && errors.lastname.type == "max"
+                            : errors.surname && errors.surname.type == "max"
                             ? "#F93B1D"
                             : "#45A849"
                         }`}
@@ -344,7 +369,7 @@ function CreateEmployee(props) {
                         className={`${
                           !(Object.keys(errors).length >= 1)
                             ? "text-[#6c757d]"
-                            : errors.lastname && errors.lastname.type == "max"
+                            : errors.surname && errors.surname.type == "max"
                             ? "text-[#F93B1D]"
                             : "text-[#45A849]"
                         } form2spans`}
@@ -361,7 +386,7 @@ function CreateEmployee(props) {
             <span className="form2labels">ავატარი*</span>
             <div
               className={`${
-                errors.image_upload ? "border-[#F93B1D]" : "border-[#ced4da]"
+                errors.avatar ? "border-[#F93B1D]" : "border-[#ced4da]"
               } w-full h-[120px] flex justify-center items-center rounded-[8px] border border-dashed bg-[#fff]`}
             >
               <div className={fileAUrl ? "flex relative" : "hidden"}>
@@ -384,7 +409,7 @@ function CreateEmployee(props) {
                 </div>
               </div>
               <label
-                htmlFor="image_upload"
+                htmlFor="avatar"
                 className={`${
                   fileAUrl ? "hidden" : "flex justify-center"
                 } form2labels w-full h-full pt-[50px]`}
@@ -401,7 +426,7 @@ function CreateEmployee(props) {
             </div>
             <span
               className={`${
-                errors.image_upload?.type != "fileRequired" ? "flex" : "hidden"
+                errors.avatar?.type != "fileRequired" ? "flex" : "hidden"
               } items-center gap-[2px] text-[10px] text-[#FA4D4D] leading-[12px] mt-[-4px]`}
             >
               <svg
@@ -410,8 +435,7 @@ function CreateEmployee(props) {
                 height="16"
                 fill={"#F93B1D"}
                 className={`${
-                  errors.image_upload &&
-                  errors.image_upload.type != "fileRequired"
+                  errors.avatar && errors.avatar.type != "fileRequired"
                     ? "flex"
                     : "hidden"
                 } bi bi-check-lg`}
@@ -419,14 +443,14 @@ function CreateEmployee(props) {
               >
                 <path d="M12.736 3.97a.733.733 0 0 1 1.047 0c.286.289.29.756.01 1.05L7.88 12.01a.733.733 0 0 1-1.065.02L3.217 8.384a.757.757 0 0 1 0-1.06.733.733 0 0 1 1.047 0l3.052 3.093 5.4-6.425z" />
               </svg>
-              {errors.image_upload?.message}
+              {errors.avatar?.message}
             </span>
             <input
-              {...register("image_upload")}
+              {...register("avatar")}
               type="file"
               accept="image/*"
               name=""
-              id="image_upload"
+              id="avatar"
               className="hidden"
               onChange={handleFileA}
             />
@@ -440,7 +464,7 @@ function CreateEmployee(props) {
                 className={`${
                   isOpen
                     ? "border-b-0 border-[#CED4DA]"
-                    : errors.department1
+                    : errors.department_id
                     ? "border-[#F93B1D]"
                     : "border-[#CED4DA]"
                 } relative w-full h-[42px] flex justify-between rounded-[6px] p-[10px] border  focus:outline-none`}
