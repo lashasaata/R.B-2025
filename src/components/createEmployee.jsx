@@ -23,8 +23,9 @@ const schema = yup.object().shape({
     .max(255, "მაქსიმუმ 255 სიმბოლო"),
   image_upload: yup
     .mixed()
-    .test("fileRequired", "ფოტო სავალდებულოა *", (value) => {
-      return value && value.length > 0;
+    .test("fileRequired", "ფოტო სავალდებულოა", (value) => {
+      // return value && value.length > 0;
+      return value instanceof File;
     })
     .test("fileSize", "მაქსიმუმ 600kb ზომაში", (value) => {
       return value.size <= FILE_SIZE;
@@ -38,7 +39,7 @@ const schema = yup.object().shape({
 
 function CreateEmployee(props) {
   const navigate = useNavigate();
-  const [fileA, setFileA] = useState(null);
+  const [fileA, setFileA] = useState("");
   const [fileAUrl, setFileAUrl] = useState("");
 
   const {
@@ -55,31 +56,19 @@ function CreateEmployee(props) {
 
   const inputs = watch();
   console.log(inputs);
-  // console.log(errors);
+  console.log(errors);
 
   const handleFileA = (e) => {
-    const selectedFile = e.target.files[0]; // Directly access the file from the input
-    console.log("Selected File:", selectedFile);
-    // Set the file state
-    setFileA(selectedFile);
-    // Check if the selected file is an image
-    if (!selectedFile.type.startsWith("image/")) {
-      console.error("File is not an image!");
-      return;
-    }
+    const selectedFile = e.target.files[0];
     e.preventDefault();
 
     const reader = new FileReader();
     reader.onloadend = () => {
       setFileA(reader.result);
     };
-    // reader.readAsDataURL(selectedFile);
-    // const file = e.target.files[0];
-    // const reader = new FileReader();
-    // reader.onload = (event) => {
-    //   console.log("File Contents:", event.target.result);
-    //   setFileA(event.target.result);
-    // };
+
+    reader.readAsDataURL(selectedFile);
+
     // reader.readAsText(file);
     // const reader = new FileReader();
     // reader.onload = (event) => {
@@ -98,9 +87,17 @@ function CreateEmployee(props) {
     const url = URL.createObjectURL(selectedFile);
     if (url) {
       setFileAUrl(url);
-      console.log(url);
     }
+    console.log(e.target.value);
+    setValue("image_upload", selectedFile, { shouldValidate: true });
   };
+
+  const handleClearFileA = () => {
+    setFileA("");
+    setFileAUrl("");
+    setValue("image_upload", "", { shouldValidate: false });
+  };
+
   return (
     <div
       // onClick={() => props.setSlicer(false)}
@@ -341,16 +338,29 @@ function CreateEmployee(props) {
                 errors.image_upload ? "border-[#F93B1D]" : "border-[#ced4da]"
               } w-full h-[120px] flex justify-center items-center rounded-[8px] border border-dashed bg-[#fff]`}
             >
-              <div className={fileAUrl ? "flex" : "hidden"}>
-                <img src={fileAUrl} alt="avatar" />
-                <div>
-                  <img src="./trash-2.png" alt="delete" />
+              <div className={fileAUrl ? "flex relative" : "hidden"}>
+                {fileAUrl ? (
+                  <img
+                    src={fileAUrl}
+                    alt="avatar"
+                    className="w-[88px] h-[88px] rounded-full"
+                  />
+                ) : (
+                  ""
+                )}
+                <div className="absolute bottom-[-3px] right-[-3px] flex items-center justify-center w-6 h-6 rounded-full border border-solid border-[#6C757D] bg-[#fff] cursor-pointer">
+                  <img
+                    src="./trash-2.png"
+                    alt="delete"
+                    className="w-[14px] h-[14px]"
+                    onClick={handleClearFileA}
+                  />
                 </div>
               </div>
               <label
                 htmlFor="image_upload"
                 className={`${
-                  fileAUrl ? "hidden" : "flex"
+                  fileAUrl ? "hidden" : "flex justify-center"
                 } form2labels w-full h-full pt-[50px]`}
               >
                 <div className="flex flex-col items-center gap-[5px]">
