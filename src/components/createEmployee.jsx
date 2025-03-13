@@ -1,9 +1,10 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import axios from "axios";
+import { Listbox } from "@headlessui/react";
 
 const FILE_SIZE = 600 * 1024; // 600 KB
 const SUPPORTED_FORMATS = ["image/jpeg", "image/png", "image/svg"];
@@ -39,8 +40,23 @@ const schema = yup.object().shape({
 
 function CreateEmployee(props) {
   const navigate = useNavigate();
+  const depUrl = "https://momentum.redberryinternship.ge/api/departments";
   const [fileA, setFileA] = useState("");
   const [fileAUrl, setFileAUrl] = useState("");
+  const [departments, setDepartments] = useState([]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const departments = await axios.get(depUrl);
+        setDepartments(departments.data);
+        console.log(departments.data);
+      } catch (error) {
+        console.log("Fetching error:", error);
+      }
+    };
+    fetchData();
+  }, []);
 
   const {
     register,
@@ -97,6 +113,16 @@ function CreateEmployee(props) {
     setFileAUrl("");
     setValue("image_upload", "", { shouldValidate: false });
   };
+
+  const [selected, setSelected] = useState(departments[0]);
+
+  const handleChange = (e) => {
+    console.log(e);
+    setSelected(e);
+    setValue("department1", e, { shouldValidate: true }); // Update form
+  };
+
+  const [isOpen, setOpen] = useState(false);
 
   return (
     <div
@@ -405,17 +431,63 @@ function CreateEmployee(props) {
               onChange={handleFileA}
             />
           </div>
-          <div className="flex flex-col gap-[3px]">
-            <label htmlFor="department1" className="form2labels">
-              დეპარტამენტი*
-            </label>
-            <select
-              {...register("department1")}
-              name=""
-              id="department1"
-              className="form2inputs"
-            ></select>
-          </div>
+          <Listbox value={selected ? selected : ""} onChange={handleChange}>
+            <div className="relative w-[384px]">
+              <span className="form2labels mb-[3px]">დეპარტამენტი*</span>
+              {/* Select Button */}
+              <Listbox.Button
+                onClick={() => setOpen(!isOpen)}
+                className={`${
+                  isOpen
+                    ? "border-b-0 border-[#CED4DA]"
+                    : errors.department1
+                    ? "border-[#F93B1D]"
+                    : "border-[#CED4DA]"
+                } relative w-full h-[42px] flex justify-between rounded-[6px] p-[10px] border  focus:outline-none`}
+              >
+                <span className="text-left text-sm text-[#000000] leading-[17px]">
+                  {selected}
+                </span>
+                <div className="flex items-center justify-center">
+                  {isOpen ? (
+                    <img
+                      width="13"
+                      height="14"
+                      src="https://img.icons8.com/material-rounded/24/chevron-up.png"
+                      alt="chevron-up"
+                    />
+                  ) : (
+                    <img
+                      src="./icon-arrow-down.svg"
+                      alt=""
+                      className="relative"
+                    />
+                  )}
+                </div>
+              </Listbox.Button>
+
+              {/* Dropdown Options */}
+              <Listbox.Options className="absolute left-0 w-full max-h-[120px] overflow-auto bg-[#fff] border border-[#CED4DA] rounded-[6px] z-10">
+                {departments.map((e) => (
+                  <Listbox.Option
+                    key={e.id}
+                    value={e.name}
+                    disabled={e.disabled}
+                    onClick={() => setOpen(false)}
+                    className={({ active }) =>
+                      `cursor-pointer select-none p-[10px] ${
+                        active
+                          ? "bg-white text-sm text-[#212529] leading-[17px]"
+                          : "bg-white text-sm text-[#212529] leading-[17px]"
+                      } ${e.disabled ? "opacity-50 cursor-not-allowed" : ""}`
+                    }
+                  >
+                    {e.name}
+                  </Listbox.Option>
+                ))}
+              </Listbox.Options>
+            </div>
+          </Listbox>
           <div className="flex justify-end gap-[22px]">
             <button
               className="w-[102px] h-[42px] flex items-center justify-center rounded-[5px] border border-solid border-[#8338ec] text-base text-[#212529] cursor-pointer hover:border-[#B588F4]
