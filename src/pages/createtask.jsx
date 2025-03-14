@@ -25,7 +25,45 @@ const schema = yup.object().shape({
 });
 
 function CreateTask() {
+  const token = "9e6c9438-0bca-4337-a267-f9a7fd99f68b";
+  const apiUrl = (endpoint) =>
+    `https://momentum.redberryinternship.ge/api/${endpoint}`;
   const [isSubmited, setSubmited] = useState(false);
+  const [useData, setData] = useState({
+    statuses: [],
+    priorities: [],
+    departments: [],
+    employees: [],
+  });
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const statuses = await axios.get(apiUrl("statuses"));
+        const priorities = await axios.get(apiUrl("priorities"));
+        const departments = await axios.get(apiUrl("departments"));
+        const employees = await axios.get(apiUrl("employees"), {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        setData((prevData) => ({
+          ...prevData,
+          statuses: statuses.data,
+          priorities: priorities.data,
+          departments: departments.data,
+          employees: employees.data,
+        }));
+      } catch (error) {
+        console.log("Fetching data error:", error);
+      }
+    };
+    fetchData();
+  }, []);
+
+  console.log(useData);
+
   const {
     register,
     handleSubmit,
@@ -39,6 +77,44 @@ function CreateTask() {
   const inputs = watch();
   console.log(inputs, errors);
 
+  const [listings, setListings] = useState({
+    status: false,
+    priority: false,
+    department: false,
+    employee: false,
+  });
+
+  const [ids, setIds] = useState({
+    status_id: 0,
+    priority_id: 0,
+    department_id: 0,
+    employee_id: 0,
+  });
+
+  const openList = (listType) => {
+    setListings((prevListings) => ({
+      status: false,
+      priority: false,
+      department: false,
+      employee: false,
+      [listType]: !prevListings[listType],
+    }));
+  };
+
+  const handleLists = (listType, id) => {
+    setIds((prevIds) => ({
+      ...prevIds,
+      [`${listType}_id`]: id,
+    }));
+
+    setListings((prevListings) => ({
+      ...prevListings,
+      [listType]: false,
+    }));
+  };
+
+  console.log(listings);
+
   const makeSubmit = () => {};
 
   const handleErrors = () => {
@@ -47,7 +123,7 @@ function CreateTask() {
       setSubmited(true);
     }
   };
-  console.log(isSubmited);
+  // console.log(useData["priorities"].find((e) => 3 == e.id).name);
   return (
     <main className="flex flex-col gap-[25px]">
       <h1 className="text-[34px] text-[#212529] font-[600] leading-[41px]">
@@ -55,7 +131,7 @@ function CreateTask() {
       </h1>
       <form
         onSubmit={handleSubmit(makeSubmit)}
-        className="form1 flex flex-col items-end gap-[155px] pt-[65px] pr-[368px] pb-[216px] pl-[55px] mb-[100px] rounded-[4px] border border-solid border-[#ddd2ff]"
+        className="form1 flex flex-col items-end gap-[155px] pt-[65px] pr-[368px] pb-[216px] pl-[55px] mb-[100px] rounded-[4px] border border-[0.3px] border-[#ddd2ff]"
       >
         <section className="flex gap-[155px]">
           <section className="flex flex-col gap-[57px]">
@@ -141,15 +217,79 @@ function CreateTask() {
               </p>
             </div>
             <section className="flex items-center gap-8">
-              <div className="flex flex-col gap-[6px]">
-                <label htmlFor="priority" className="formlabels mt-[6px]">
-                  პრიორიტეტი*
-                </label>
-                <select
-                  name="priority"
-                  id="priority"
-                  className="forminputs h-[45px] w-[259px] appearance-none"
-                ></select>
+              <div className="relative">
+                <div className="flex flex-col gap-[6px]">
+                  <label htmlFor="status_id" className="formlabels mt-[6px]">
+                    პრიორიტეტი*
+                  </label>
+
+                  <div
+                    onClick={() => openList("priority")}
+                    className={`${
+                      listings.priority
+                        ? "border-b-0 rounded-t-[5px] border-[#8338EC]"
+                        : errors.priority
+                        ? "rounded-[5px] border-[#F93B1D]"
+                        : "rounded-[5px] border-[#dee2e6]"
+                    } w-[259px] h-[46px] p-[14px] border border-solid  flex items-center justify-between relative cursor-pointer`}
+                  >
+                    <div className="flex items-center gap-[6px]" id="priority">
+                      <img
+                        src={
+                          ids.priority_id == 0
+                            ? "https://momentum.redberryinternship.ge/storage/priority-icons/Medium.svg"
+                            : useData["priorities"].find(
+                                (e) => ids.priority_id == e.id
+                              ).icon
+                        }
+                        alt=""
+                      />
+                      <span className="text-sm text-[#0d0f10] font-[300] leading-[17px] grow">
+                        {ids.priority_id == 0
+                          ? "საშუალო"
+                          : useData["priorities"].find(
+                              (e) => ids.priority_id == e.id
+                            ).name}
+                      </span>
+                    </div>
+                    <img src="/icon-arrow-down.svg" alt="down" />
+                  </div>
+                  <section
+                    className={`${
+                      listings.priority ? "flex flex-col" : "hidden"
+                    } absolute w-full max-h-[150px] overflow-scroll bg-[#fff] z-50 left-0 bottom-[1px] transform translate-y-full rounded-b-[5px]`}
+                  >
+                    {useData.priorities.map((e) => {
+                      return (
+                        <div
+                          key={e.id}
+                          onClick={() => handleLists("priority", e.id)}
+                          className={`${
+                            e.id ==
+                            useData.priorities[useData.priorities.length - 1].id
+                              ? "border-b rounded-b-[5px]"
+                              : ""
+                          }w-[259px] h-[46px] flex items-center gap-[6px] p-[14px] border-l border-r border-solid  border-[#8338EC] cursor-pointer`}
+                        >
+                          <img src={e.icon} alt="" />
+                          <span
+                            id={e.id}
+                            className="text-sm text-[#0d0f10] font-[300] leading-[17px] grow"
+                          >
+                            {e.name}
+                          </span>
+                        </div>
+                      );
+                    })}
+                  </section>
+                  <input
+                    {...register("status_id")}
+                    type="text"
+                    id="inputStatus"
+                    // value={values.region}
+                    className="hidden"
+                  />
+                </div>
               </div>
               <div className="flex flex-col gap-[6px]">
                 <label htmlFor="status" className="formlabels mt-[6px]">
