@@ -25,6 +25,7 @@ const schema = yup.object().shape({
 });
 
 function CreateTask() {
+  const [isSubmited, setSubmited] = useState(false);
   const {
     register,
     handleSubmit,
@@ -39,6 +40,14 @@ function CreateTask() {
   console.log(inputs, errors);
 
   const makeSubmit = () => {};
+
+  const handleErrors = () => {
+    console.log(isSubmited);
+    if (!isSubmited) {
+      setSubmited(true);
+    }
+  };
+  console.log(isSubmited);
   return (
     <main className="flex flex-col gap-[25px]">
       <h1 className="text-[34px] text-[#212529] font-[600] leading-[41px]">
@@ -59,11 +68,35 @@ function CreateTask() {
                 type="text"
                 name="name"
                 id="title"
-                className="forminputs h-[45px] w-[550px]"
+                className={`${
+                  errors.name ? "border-[#F93B1D]" : "border-[#dee2e6]"
+                } forminputs border border-solid h-[45px] w-[550px]`}
               />
               <p className="flex flex-col gap-[2px]">
-                <span className="formspans">მინიმუმ 3 სიმბოლო</span>
-                <span className="formspans">მაქსიმუმ 255 სიმბოლო</span>
+                <span
+                  className={`${
+                    !isSubmited
+                      ? "text-[#6c757d]"
+                      : errors.name &&
+                        (errors.name.type == "min" ||
+                          errors.name.type == "required")
+                      ? "text-[#F93B1D]"
+                      : "text-[#45A849]"
+                  } formspans`}
+                >
+                  მინიმუმ 3 სიმბოლო
+                </span>
+                <span
+                  className={`${
+                    !isSubmited
+                      ? "text-[#6c757d]"
+                      : errors.name && errors.name.type == "max"
+                      ? "text-[#F93B1D]"
+                      : "text-[#45A849]"
+                  } formspans`}
+                >
+                  მაქსიმუმ 255 სიმბოლო
+                </span>
               </p>
             </div>
             <div className="flex flex-col gap-1">
@@ -77,11 +110,34 @@ function CreateTask() {
                 {...register("description")}
                 name="description"
                 id="description"
-                className="forminputs h-[133px] w-[550px] resize-none text-sm text-[#0D0F10]"
+                className={`${
+                  errors.description ? "border-[#F93B1D]" : "border-[#dee2e6]"
+                } forminputs border border-solid h-[133px] w-[550px] resize-none text-sm text-[#0D0F10]`}
               ></textarea>
               <p className="flex flex-col gap-[2px]">
-                <span className="formspans">მინიმუმ 4 სიტყვა</span>
-                <span className="formspans">მაქსიმუმ 255 სიმბოლო</span>
+                <span
+                  className={`${
+                    !isSubmited
+                      ? "text-[#6c757d]"
+                      : errors.description &&
+                        errors.description.type == "minWords"
+                      ? "text-[#F93B1D]"
+                      : "text-[#45A849]"
+                  } formspans`}
+                >
+                  მინიმუმ 4 სიტყვა
+                </span>
+                <span
+                  className={`${
+                    !isSubmited
+                      ? "text-[#6c757d]"
+                      : errors.description && errors.description.type == "max"
+                      ? "text-[#F93B1D]"
+                      : "text-[#45A849]"
+                  } formspans`}
+                >
+                  მაქსიმუმ 255 სიმბოლო
+                </span>
               </p>
             </div>
             <section className="flex items-center gap-8">
@@ -147,6 +203,7 @@ function CreateTask() {
           </button>
           <button
             type="submit"
+            onClick={handleErrors}
             className="w-[208px] h-[42px] rounded-[5px] bg-[#8338ec] text-[#fff] text-lg cursor-pointer hover:bg-[#B588F4]"
           >
             დავალების შექმნა
