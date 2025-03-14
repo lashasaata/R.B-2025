@@ -39,6 +39,11 @@ header {
   padding: 14px;
   background-color: #fff;
   outline: none;
+  font-size: 14px;
+  line-height: 17px;
+  font-weight: 300;
+  flex-grow: 1;
+  color: #0d0f10;
 }
 
 .blur {
