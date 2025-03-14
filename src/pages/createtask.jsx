@@ -283,6 +283,65 @@ function CreateTask() {
                     })}
                   </section>
                   <input
+                    {...register("priority_id")}
+                    type="text"
+                    id="inputPriority"
+                    // value={values.region}
+                    className="hidden"
+                  />
+                </div>
+              </div>
+              <div className="relative">
+                <div className="flex flex-col gap-[6px]">
+                  <label htmlFor="status_id" className="formlabels mt-[6px]">
+                    სტატუსი*
+                  </label>
+                  <div
+                    onClick={() => openList("status")}
+                    className={`${
+                      listings.status
+                        ? "border-b-0 rounded-t-[5px] border-[#8338EC]"
+                        : errors.status
+                        ? "rounded-[5px] border-[#F93B1D]"
+                        : "rounded-[5px] border-[#dee2e6]"
+                    } w-[259px] h-[46px] p-[14px] border border-solid  flex items-center justify-between relative cursor-pointer`}
+                  >
+                    <span className="text-sm text-[#0d0f10] font-[300] leading-[17px] grow">
+                      {ids.status_id == 0
+                        ? "დასაწყები"
+                        : useData["statuses"].find((e) => ids.status_id == e.id)
+                            .name}
+                    </span>
+                    <img src="/icon-arrow-down.svg" alt="down" />
+                  </div>
+                  <section
+                    className={`${
+                      listings.status ? "flex flex-col" : "hidden"
+                    } absolute w-full bg-[#fff] z-50 left-0 bottom-[1px] transform translate-y-full rounded-b-[5px]`}
+                  >
+                    {useData.statuses.map((e) => {
+                      return (
+                        <div
+                          key={e.id}
+                          onClick={() => handleLists("status", e.id)}
+                          className={`${
+                            e.id ==
+                            useData.statuses[useData.statuses.length - 1].id
+                              ? "border-b rounded-b-[5px]"
+                              : ""
+                          }w-[259px] h-[46px] p-[14px] border-l border-r border-solid  border-[#8338EC] cursor-pointer`}
+                        >
+                          <span
+                            id={e.id}
+                            className="text-sm text-[#0d0f10] font-[300] leading-[17px] grow"
+                          >
+                            {e.name}
+                          </span>
+                        </div>
+                      );
+                    })}
+                  </section>
+                  <input
                     {...register("status_id")}
                     type="text"
                     id="inputStatus"
@@ -290,16 +349,6 @@ function CreateTask() {
                     className="hidden"
                   />
                 </div>
-              </div>
-              <div className="flex flex-col gap-[6px]">
-                <label htmlFor="status" className="formlabels mt-[6px]">
-                  სტატუსი
-                </label>
-                <select
-                  name="status"
-                  id="status"
-                  className="forminputs h-[45px] w-[259px] appearance-none"
-                ></select>
               </div>
             </section>
           </section>
