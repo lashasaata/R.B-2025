@@ -256,20 +256,17 @@ function CreateTask() {
                   </div>
                   <section
                     className={`${
-                      listings.priority ? "flex flex-col" : "hidden"
-                    } absolute w-full max-h-[150px] overflow-scroll bg-[#fff] z-50 left-0 bottom-[1px] transform translate-y-full rounded-b-[5px]`}
+                      listings.priority
+                        ? "flex flex-col border-b border-r border-l rounded-b-[5px] border-[#8338EC]"
+                        : "hidden"
+                    } absolute w-full bg-[#fff] z-50 left-0 bottom-[1px] transform translate-y-full rounded-b-[5px]`}
                   >
                     {useData.priorities.map((e) => {
                       return (
                         <div
                           key={e.id}
                           onClick={() => handleLists("priority", e.id)}
-                          className={`${
-                            e.id ==
-                            useData.priorities[useData.priorities.length - 1].id
-                              ? "border-b rounded-b-[5px]"
-                              : ""
-                          }w-[259px] h-[46px] flex items-center gap-[6px] p-[14px] border-l border-r border-solid  border-[#8338EC] cursor-pointer`}
+                          className="w-[259px] h-[46px] flex items-center gap-[6px] p-[14px] cursor-pointer"
                         >
                           <img src={e.icon} alt="" />
                           <span
@@ -316,7 +313,9 @@ function CreateTask() {
                   </div>
                   <section
                     className={`${
-                      listings.status ? "flex flex-col" : "hidden"
+                      listings.status
+                        ? "flex flex-col border-b border-r border-l rounded-b-[5px] border-[#8338EC]"
+                        : "hidden"
                     } absolute w-full bg-[#fff] z-50 left-0 bottom-[1px] transform translate-y-full rounded-b-[5px]`}
                   >
                     {useData.statuses.map((e) => {
@@ -324,12 +323,7 @@ function CreateTask() {
                         <div
                           key={e.id}
                           onClick={() => handleLists("status", e.id)}
-                          className={`${
-                            e.id ==
-                            useData.statuses[useData.statuses.length - 1].id
-                              ? "border-b rounded-b-[5px]"
-                              : ""
-                          }w-[259px] h-[46px] p-[14px] border-l border-r border-solid  border-[#8338EC] cursor-pointer`}
+                          className="w-[259px] h-[46px] p-[14px] cursor-pointer"
                         >
                           <span
                             id={e.id}
@@ -353,25 +347,134 @@ function CreateTask() {
             </section>
           </section>
           <section className="flex flex-col gap-[61px]">
-            <div className="flex flex-col gap-[6px] mb-8">
-              <label htmlFor="department" className="formlabels mt-[6px]">
-                დეპარტამენტი*
-              </label>
-              <select
-                name="department"
-                id="department"
-                className="forminputs appearance-none w-[550px] h-[45px]"
-              ></select>
+            <div className="relative">
+              <div className="flex flex-col gap-[6px]">
+                <label htmlFor="status_id" className="formlabels mt-[6px]">
+                  დეპარტამენტი*
+                </label>
+                <div
+                  onClick={() => openList("department")}
+                  className={`${
+                    listings.department
+                      ? "border-b-0 rounded-t-[5px] border-[#8338EC]"
+                      : errors.department
+                      ? "rounded-[5px] border-[#F93B1D]"
+                      : "rounded-[5px] border-[#dee2e6]"
+                  } w-[550px] h-[45px] p-[14px] border border-solid  flex items-center justify-between relative cursor-pointer`}
+                >
+                  <span className="text-sm text-[#0d0f10] font-[300] leading-[17px] grow">
+                    {ids.department_id == 0
+                      ? "დიზააინის დეპარტამენტი"
+                      : useData["departments"].find(
+                          (e) => ids.department_id == e.id
+                        ).name}
+                  </span>
+                  <img src="/icon-arrow-down.svg" alt="down" />
+                </div>
+                <section
+                  className={`${
+                    listings.department
+                      ? "flex flex-col border-b border-r border-l rounded-b-[5px] border-[#8338EC]"
+                      : "hidden"
+                  } absolute w-full bg-[#fff] z-50 left-0 bottom-[1px] transform translate-y-full rounded-b-[5px]`}
+                >
+                  {useData.departments.map((e) => {
+                    return (
+                      <div
+                        key={e.id}
+                        onClick={() => handleLists("department", e.id)}
+                        className="w-[550px] h-[45px] p-[14px] cursor-pointer"
+                      >
+                        <span
+                          id={e.id}
+                          className="text-sm text-[#0d0f10] font-[300] leading-[17px] grow"
+                        >
+                          {e.name}
+                        </span>
+                      </div>
+                    );
+                  })}
+                </section>
+                <input
+                  {...register("department_id")}
+                  type="text"
+                  id="inputDepartment"
+                  // value={values.region}
+                  className="hidden"
+                />
+              </div>
             </div>
-            <div className="flex flex-col gap-[6px]">
-              <label htmlFor="employee" className="formlabels mt-[6px]">
-                პასუხისმგებელი თანამშრომელი*
-              </label>
-              <select
-                name="employee"
-                id="employee"
-                className="forminputs appearance-none w-[550px] h-[45px]"
-              ></select>
+            <div className="relative">
+              <div className="flex flex-col gap-[6px]">
+                <label htmlFor="status_id" className="formlabels mt-[6px]">
+                  პასუხისმგებელი თანამშრომელი*
+                </label>
+                <div
+                  onClick={() => openList("employee")}
+                  className={`${
+                    listings.employee
+                      ? "border-b-0 rounded-t-[5px] border-[#8338EC]"
+                      : errors.employee
+                      ? "rounded-[5px] border-[#F93B1D]"
+                      : "rounded-[5px] border-[#dee2e6]"
+                  } w-[550px] h-[45px] p-[14px] border border-solid  flex items-center justify-between relative cursor-pointer`}
+                >
+                  <span className="text-sm text-[#0d0f10] font-[300] leading-[17px] grow">
+                    {ids.employee_id == 0
+                      ? "დიზააინის დეპარტამენტი"
+                      : useData["employees"].find(
+                          (e) => ids.employee_id == e.id
+                        ).name}
+                  </span>
+                  <img src="/icon-arrow-down.svg" alt="down" />
+                </div>
+                <section
+                  className={`${
+                    listings.employee
+                      ? "flex flex-col border-b border-r border-l rounded-b-[5px] border-[#8338EC]"
+                      : "hidden"
+                  } absolute w-full bg-[#fff] z-50 left-0 bottom-[1px] transform translate-y-full rounded-b-[5px]`}
+                >
+                  <div className="flex items-center gap-2 p-[14px] text-base text-[#8338EC] font-normal leading-[19px]">
+                    <div className="w-[18px] h-[18px] flex items-center justify-center rounded-full border border-solid border-[#8338EC]">
+                      +
+                    </div>
+                    <span>დაამატე თანამშრომელი</span>
+                  </div>
+                  {useData.employees
+                    .filter((e) => e.department.id == ids.department_id)
+                    .map((e) => {
+                      return (
+                        <div
+                          key={e.id}
+                          onClick={() => handleLists("employee", e.id)}
+                          className="w-[550px] h-[45px] flex items-center pl-[14px] cursor-pointer"
+                        >
+                          <div className="flex items-center gap-[6px]">
+                            <img
+                              src={e.avatar}
+                              alt="avatar"
+                              className="w-7 h-7 rounded-full"
+                            />
+                            <span
+                              id={e.id}
+                              className="text-sm text-[#0d0f10] font-[300] leading-[17px] grow"
+                            >
+                              {e.name} {e.surname}
+                            </span>
+                          </div>
+                        </div>
+                      );
+                    })}
+                </section>
+                <input
+                  {...register("employee_id")}
+                  type="text"
+                  id="inputEmployee"
+                  // value={values.region}
+                  className="hidden"
+                />
+              </div>
             </div>
             <div className="flex flex-col gap-[6px] mt-[108px]">
               <label htmlFor="deadline" className="formlabels mt-[6px]">
