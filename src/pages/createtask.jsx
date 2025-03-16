@@ -252,7 +252,21 @@ function CreateTask() {
                             ).name}
                       </span>
                     </div>
-                    <img src="/icon-arrow-down.svg" alt="down" />
+                    <svg
+                      width="12"
+                      height="7"
+                      viewBox="0 0 12 7"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        d="M1 1L6 6L11 1"
+                        stroke="#343A40"
+                        strokeWidth="1.5"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                    </svg>
                   </div>
                   <section
                     className={`${
@@ -346,7 +360,7 @@ function CreateTask() {
               </div>
             </section>
           </section>
-          <section className="flex flex-col gap-[61px]">
+          <section className="flex flex-col gap-[93px]">
             <div className="relative">
               <div className="flex flex-col gap-[6px]">
                 <label htmlFor="status_id" className="formlabels mt-[6px]">
@@ -421,10 +435,15 @@ function CreateTask() {
                 >
                   <span className="text-sm text-[#0d0f10] font-[300] leading-[17px] grow">
                     {ids.employee_id == 0
-                      ? "დიზააინის დეპარტამენტი"
-                      : useData["employees"].find(
-                          (e) => ids.employee_id == e.id
-                        ).name}
+                      ? ""
+                      : (() => {
+                          const employee = useData.employees.find(
+                            (e) => ids.employee_id == e.id
+                          );
+                          return employee
+                            ? `${employee.name} ${employee.surname}`
+                            : "";
+                        })()}
                   </span>
                   <img src="/icon-arrow-down.svg" alt="down" />
                 </div>
@@ -476,8 +495,12 @@ function CreateTask() {
                 />
               </div>
             </div>
-            <div className="flex flex-col gap-[6px] mt-[108px]">
+            <div className="flex flex-col gap-[6px] mt-[76px]">
               <label htmlFor="deadline" className="formlabels mt-[6px]">
+                დედლაინი
+              </label>
+              <div className="relative w-[318px] h-[45px] flex items-center gap-[6px] px-[14px] rounded-[5px] border border-solid border-[#dee2e6]">
+                {/* <label htmlFor="deadline" className="formlabels mt-[6px]">
                 დედლაინი
               </label>
               <input
@@ -485,7 +508,76 @@ function CreateTask() {
                 name=""
                 id="deadline"
                 className="forminputs w-[318px] h-[45px] text-sm text-[#0D0F10] text-[#ADB5BD]"
-              />
+              /> */}
+                <img src="./Vector.png" alt="date" />
+                <input
+                  type="text"
+                  id="deadline"
+                  className="outline-none w-[268px] text-sm text-[#0d0f10] leading-[1.43] tracking-[-0.18px]"
+                />
+                <div className="absolute w-full flex flex-col items-center gap-[22px] p-4 bg-[#fff] deadline-shadow">
+                  <div className="w-[286px] flex items-center justify-between">
+                    <div className="text-[13px] text-[#000] leading-[16px] font-bold">
+                      იანვარი 2025
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <img src="./Arrow-up.png" alt="next" />
+                      <img src="./Arrow-down.png" alt="prev" />
+                    </div>
+                  </div>
+                  <section className="flex flex-col w-[224px]">
+                    <div className="flex">
+                      <span className="deadline-spans">Su</span>
+                      <span className="deadline-spans">Mo</span>
+                      <span className="deadline-spans">Tu</span>
+                      <span className="deadline-spans">We</span>
+                      <span className="deadline-spans">Th</span>
+                      <span className="deadline-spans">Fr</span>
+                      <span className="deadline-spans">Sa</span>
+                    </div>
+                    <div className="flex flex-wrap">
+                      <button>1</button>
+                      <button>2</button>
+                      <button>3</button>
+                      <button>4</button>
+                      <button>5</button>
+                      <button>6</button>
+                      <button>7</button>
+                      <button>8</button>
+                      <button>9</button>
+                      <button>10</button>
+                      <button>11</button>
+                      <button>12</button>
+                      <button>13</button>
+                      <button>14</button>
+                      <button>15</button>
+                      <button>16</button>
+                      <button>17</button>
+                      <button>18</button>
+                      <button>19</button>
+                      <button>20</button>
+                      <button>21</button>
+                      <button>22</button>
+                      <button>23</button>
+                      <button>24</button>
+                      <button>25</button>
+                      <button>26</button>
+                      <button>27</button>
+                      <button>28</button>
+                      <button>29</button>
+                      <button>30</button>
+                    </div>
+                  </section>
+                  <div className="w-[286px] flex items-center justify-between px-4">
+                    <button className="outline-none text-[13px] text-[#8338ec] leading-[16px]">
+                      Cancel
+                    </button>
+                    <button className="outline-none text-[13px] text-[#8338ec] leading-[16px]">
+                      OK
+                    </button>
+                  </div>
+                </div>
+              </div>
             </div>
           </section>
         </section>

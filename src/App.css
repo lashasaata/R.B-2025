@@ -68,3 +68,18 @@ header {
   outline: none;
   appearance: none;
 }
+
+.deadline-shadow {
+  box-shadow: 0 12px 24px 0 rgba(0, 0, 0, 0.2);
+}
+
+.deadline-spans {
+  width: 32px;
+  height: 32px;
+  border-radius: 2px;
+  flex-grow: 0;
+  text-align: center;
+  font-size: 14px;
+  line-height: 1.43;
+  color: #0d0f10;
+}
