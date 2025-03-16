@@ -1,10 +1,9 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { data, useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import axios from "axios";
-import { Description } from "@headlessui/react";
 
 const schema = yup.object().shape({
   name: yup
@@ -116,6 +115,113 @@ function CreateTask() {
   };
 
   console.log(listings);
+  let today = new Date();
+  const [dateValue, setDateValue] = useState("");
+  const [chosenDate, setChosenDate] = useState(new Date());
+
+  const [selectedDate, setSelectedDate] = useState(new Date());
+  let year = selectedDate.getFullYear();
+  let month = selectedDate.getMonth();
+
+  const lastOfMonth = new Date(year, month + 1, 0);
+  const lastOfPrevMonth = new Date(year, month, 0);
+
+  let prevWDays = [];
+  for (let i = 0; i <= lastOfPrevMonth.getDay(); i++) {
+    let day = lastOfPrevMonth.getDate() - lastOfPrevMonth.getDay() + i;
+    prevWDays.push(day);
+  }
+
+  const firstOfNextMonth = new Date(year, month + 1, 1);
+
+  let nextWDays = [];
+  for (let i = firstOfNextMonth.getDay(); i < 7; i++) {
+    let day = firstOfNextMonth.getDate() - firstOfNextMonth.getDay() + i;
+    nextWDays.push(day);
+  }
+
+  const isToday = (day) => {
+    return (
+      today.getDate() === day &&
+      today.getMonth() === selectedDate.getMonth() &&
+      today.getFullYear() === selectedDate.getFullYear()
+    );
+  };
+
+  const setDate = (e) => {
+    e.preventDefault();
+    let date = e.target.innerText;
+    let newDate = new Date(year, month, date);
+    setSelectedDate(newDate);
+  };
+
+  const changeMonth = (type) => {
+    if (type == "next") {
+      if (month == 11) year++;
+      month = (month + 1) % 12;
+      let newDate = new Date(year, month, selectedDate.getDate());
+      setSelectedDate(newDate);
+    } else {
+      if (month == 0) year--;
+      month = (month - 1 + 12) % 12;
+      let newDate = new Date(year, month, selectedDate.getDate());
+      setSelectedDate(newDate);
+    }
+  };
+
+  const monthName = (month) => {
+    switch (month) {
+      case 0:
+        return "იანვარი";
+      case 1:
+        return "თებერვალი";
+      case 2:
+        return "მარტი";
+      case 3:
+        return "აპრილი";
+      case 4:
+        return "მაისი";
+      case 5:
+        return "ივნისი";
+      case 6:
+        return "ივლისი";
+      case 7:
+        return "აგვისტო";
+      case 8:
+        return "სექტემბერი";
+      case 9:
+        return "ოქტომბერი";
+      case 10:
+        return "ნოემბერი";
+      case 11:
+        return "დეკემბერი";
+      default:
+        return "უცნობი თვე";
+    }
+  };
+
+  const handleApply = (e) => {
+    e.preventDefault();
+    let inputValue = `${selectedDate.getDate()}.${selectedDate.getMonth()}.${selectedDate.getFullYear()}`;
+
+    setDateValue(inputValue);
+    setListings({
+      ...listings,
+      deadline: false,
+    });
+    setChosenDate(selectedDate);
+  };
+
+  const handleCancel = (e) => {
+    e.preventDefault();
+
+    setListings({
+      ...listings,
+      deadline: false,
+    });
+
+    setSelectedDate(chosenDate);
+  };
 
   const makeSubmit = () => {};
 
@@ -501,41 +607,61 @@ function CreateTask() {
               <label htmlFor="deadline" className="formlabels mt-[6px]">
                 დედლაინი
               </label>
-              <div className="relative w-[318px] h-[45px] flex items-center gap-[6px] px-[14px] rounded-[5px] border border-solid border-[#dee2e6]">
-                {/* <label htmlFor="deadline" className="formlabels mt-[6px]">
+              <div className="relative w-[318px]">
+                <div
+                  className={`${
+                    listings.deadline ? "border-[#8338EC]" : "border-[#dee2e6]"
+                  } w-[318px] h-[45px] flex items-center gap-[6px] px-[14px] rounded-[5px] border border-solid `}
+                >
+                  {/* <label htmlFor="deadline" className="formlabels mt-[6px]">
                 დედლაინი
-              </label>
-              <input
-                type="date"
-                name=""
-                id="deadline"
-                className="forminputs w-[318px] h-[45px] text-sm text-[#0D0F10] text-[#ADB5BD]"
-              /> */}
-                <img
-                  src="./Vector.png"
-                  alt="date"
-                  onClick={() => openList("deadline")}
-                />
-                <input
-                  type="text"
-                  id="deadline"
-                  className="outline-none w-[268px] text-sm text-[#0d0f10] leading-[1.43] tracking-[-0.18px]"
-                />
+                  </label>
+                  <input
+                    type="date"
+                    name=""
+                    id="deadline"
+                    className="forminputs w-[318px] h-[45px] text-sm text-[#0D0F10] text-[#ADB5BD]"
+                  /> */}
+                  <img
+                    src="./Vector.png"
+                    alt="date"
+                    onClick={() => openList("deadline")}
+                  />
+                  <input
+                    type="text"
+                    id="deadline"
+                    placeholder="DD/MM/YYYY"
+                    value={dateValue}
+                    className="outline-none w-[268px] text-sm text-[#0d0f10] leading-[1.43] tracking-[-0.18px] placeholder:text-[adb5bd] plceholder:text-sm placeholder:leading-[20px] placeholer:tracking-[-0.18px]"
+                  />
+                </div>
                 <div
                   className={`${
                     listings.deadline ? "flex" : "hidden"
-                  } absolute bottom-[-4px] left-0 transform translate-y-full w-full flex-col items-center gap-[22px] p-4 bg-[#fff] deadline-shadow`}
+                  } absolute bottom-[-4px] left-0 transform translate-y-full w-full h-[336px] flex-col items-center gap-[22px] p-4 bg-[#fff] deadline-shadow`}
                 >
                   <div className="w-[286px] flex items-center justify-between">
-                    <div className="text-[13px] text-[#000] leading-[16px] font-bold">
-                      იანვარი 2025
+                    <div className="flex items-center gap-1 text-[13px] text-[#000] leading-[16px] font-bold">
+                      {monthName(selectedDate.getMonth())}{" "}
+                      {selectedDate.getFullYear()}
+                      <img src="./Rectangle 4.png" alt="" />
                     </div>
                     <div className="flex items-center gap-2">
-                      <img src="./Arrow-up.png" alt="next" />
-                      <img src="./Arrow-down.png" alt="prev" />
+                      <img
+                        src="./Arrow-up.png"
+                        alt="next"
+                        onClick={() => changeMonth("next")}
+                        className="cursor-pointer"
+                      />
+                      <img
+                        src="./Arrow-down.png"
+                        alt="prev"
+                        onClick={() => changeMonth("prev")}
+                        className="cursor-pointer"
+                      />
                     </div>
                   </div>
-                  <section className="flex flex-col w-[224px]">
+                  <section className="flex flex-col w-[224px] flex-grow">
                     <div className="flex">
                       <span className="deadline-spans">Su</span>
                       <span className="deadline-spans">Mo</span>
@@ -546,43 +672,55 @@ function CreateTask() {
                       <span className="deadline-spans">Sa</span>
                     </div>
                     <div className="flex flex-wrap">
-                      <button>1</button>
-                      <button>2</button>
-                      <button>3</button>
-                      <button>4</button>
-                      <button>5</button>
-                      <button>6</button>
-                      <button>7</button>
-                      <button>8</button>
-                      <button>9</button>
-                      <button>10</button>
-                      <button>11</button>
-                      <button>12</button>
-                      <button>13</button>
-                      <button>14</button>
-                      <button>15</button>
-                      <button>16</button>
-                      <button>17</button>
-                      <button>18</button>
-                      <button>19</button>
-                      <button>20</button>
-                      <button>21</button>
-                      <button>22</button>
-                      <button>23</button>
-                      <button>24</button>
-                      <button>25</button>
-                      <button>26</button>
-                      <button>27</button>
-                      <button>28</button>
-                      <button>29</button>
-                      <button>30</button>
+                      {prevWDays.map((e) => {
+                        return (
+                          <button key={e} className="disabled" disabled>
+                            {e}
+                          </button>
+                        );
+                      })}
+                      {Array.from(
+                        { length: lastOfMonth.getDate() },
+                        (_, index) => {
+                          const day = index + 1;
+
+                          return (
+                            <button
+                              key={index}
+                              onClick={(e) => setDate(e, day)}
+                              className={`${
+                                selectedDate.getDate() === day
+                                  ? "selected"
+                                  : isToday(day)
+                                  ? "normal border border-[#8338ec] hover:bg-[#8338ec] text-[#0d0f10] hover:text-[#fff] hover:opacity-60"
+                                  : "normal hover:bg-[#8338ec] text-[#0d0f10] hover:text-[#fff] hover:opacity-60"
+                              }`}
+                            >
+                              {day}
+                            </button>
+                          );
+                        }
+                      )}
+                      {nextWDays.map((e) => {
+                        return (
+                          <button key={e} className="disabled" disabled>
+                            {e}
+                          </button>
+                        );
+                      })}
                     </div>
                   </section>
-                  <div className="w-[286px] flex items-center justify-between px-4">
-                    <button className="outline-none text-[13px] text-[#8338ec] leading-[16px]">
+                  <div className="w-[286px] flex items-center justify-between px-4 mt-auto">
+                    <button
+                      className="outline-none text-[13px] text-[#8338ec] leading-[16px] cursor-pointer"
+                      onClick={handleCancel}
+                    >
                       Cancel
                     </button>
-                    <button className="outline-none text-[13px] text-[#8338ec] leading-[16px]">
+                    <button
+                      className="outline-none text-[13px] text-[#8338ec] leading-[16px] cursor-pointer"
+                      onClick={handleApply}
+                    >
                       OK
                     </button>
                   </div>
