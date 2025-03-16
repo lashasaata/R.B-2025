@@ -82,6 +82,7 @@ function CreateTask() {
     priority: false,
     department: false,
     employee: false,
+    deadline: false,
   });
 
   const [ids, setIds] = useState({
@@ -97,6 +98,7 @@ function CreateTask() {
       priority: false,
       department: false,
       employee: false,
+      deadline: false,
       [listType]: !prevListings[listType],
     }));
   };
@@ -509,13 +511,21 @@ function CreateTask() {
                 id="deadline"
                 className="forminputs w-[318px] h-[45px] text-sm text-[#0D0F10] text-[#ADB5BD]"
               /> */}
-                <img src="./Vector.png" alt="date" />
+                <img
+                  src="./Vector.png"
+                  alt="date"
+                  onClick={() => openList("deadline")}
+                />
                 <input
                   type="text"
                   id="deadline"
                   className="outline-none w-[268px] text-sm text-[#0d0f10] leading-[1.43] tracking-[-0.18px]"
                 />
-                <div className="absolute w-full flex flex-col items-center gap-[22px] p-4 bg-[#fff] deadline-shadow">
+                <div
+                  className={`${
+                    listings.deadline ? "flex" : "hidden"
+                  } absolute bottom-[-4px] left-0 transform translate-y-full w-full flex-col items-center gap-[22px] p-4 bg-[#fff] deadline-shadow`}
+                >
                   <div className="w-[286px] flex items-center justify-between">
                     <div className="text-[13px] text-[#000] leading-[16px] font-bold">
                       იანვარი 2025
