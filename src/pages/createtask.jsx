@@ -452,21 +452,11 @@ function CreateTask(props) {
                             ).name}
                       </span>
                     </div>
-                    <svg
-                      width="12"
-                      height="7"
-                      viewBox="0 0 12 7"
-                      fill="none"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <path
-                        d="M1 1L6 6L11 1"
-                        stroke="#343A40"
-                        strokeWidth="1.5"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      />
-                    </svg>
+                    {listings.priority ? (
+                      <img src="./arrow-up-v.png" alt="" />
+                    ) : (
+                      <img src="./arrow-down-b.png" alt="" />
+                    )}
                   </div>
                   <section
                     className={`${
@@ -523,7 +513,11 @@ function CreateTask(props) {
                         : useData["statuses"].find((e) => ids.status_id == e.id)
                             .name}
                     </span>
-                    <img src="/icon-arrow-down.svg" alt="down" />
+                    {listings.status ? (
+                      <img src="./arrow-up-v.png" alt="" />
+                    ) : (
+                      <img src="./arrow-down-b.png" alt="" />
+                    )}
                   </div>
                   <section
                     className={`${
@@ -583,7 +577,11 @@ function CreateTask(props) {
                           (e) => ids.department_id == e.id
                         ).name}
                   </span>
-                  <img src="/icon-arrow-down.svg" alt="down" />
+                  {listings.department ? (
+                    <img src="./arrow-up-v.png" alt="" />
+                  ) : (
+                    <img src="./arrow-down-b.png" alt="" />
+                  )}
                 </div>
                 <section
                   className={`${
@@ -620,11 +618,20 @@ function CreateTask(props) {
             </div>
             <div className="relative">
               <div className="flex flex-col gap-[6px]">
-                <label htmlFor="status_id" className="formlabels mt-[6px]">
+                <label
+                  htmlFor="status_id"
+                  className={`${
+                    ids.department_id == 0 ? "text-[#ADB5BD]" : ""
+                  } text-base text-[#343a40] leading-[19px]mt-[6px] `}
+                >
                   პასუხისმგებელი თანამშრომელი*
                 </label>
                 <div
-                  onClick={() => openList("employee")}
+                  onClick={
+                    ids.department_id == 0
+                      ? (e) => e.preventDefault()
+                      : () => openList("employee")
+                  }
                   className={`${
                     listings.employee
                       ? "border-b-0 rounded-t-[5px] border-[#8338EC]"
@@ -660,7 +667,13 @@ function CreateTask(props) {
                           })()}
                     </span>
                   </div>
-                  <img src="/icon-arrow-down.svg" alt="down" />
+                  {ids.department_id == 0 ? (
+                    <img src="./arrow-down-g.png" alt="" />
+                  ) : listings.employee ? (
+                    <img src="./arrow-up-v.png" alt="" />
+                  ) : (
+                    <img src="./arrow-down-b.png" alt="" />
+                  )}
                 </div>
                 <section
                   className={`${
