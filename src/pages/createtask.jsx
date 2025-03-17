@@ -526,22 +526,24 @@ function CreateTask(props) {
                         : "hidden"
                     } absolute w-full bg-[#fff] z-50 left-0 bottom-[1px] transform translate-y-full rounded-b-[5px]`}
                   >
-                    {useData.statuses.map((e) => {
-                      return (
-                        <div
-                          key={e.id}
-                          onClick={() => handleLists("status", e.id)}
-                          className="w-[259px] h-[46px] p-[14px] cursor-pointer"
-                        >
-                          <span
-                            id={e.id}
-                            className="text-sm text-[#0d0f10] font-[300] leading-[17px] grow"
+                    {useData.statuses
+                      .filter((e) => e.name != "დასრულებული")
+                      .map((e) => {
+                        return (
+                          <div
+                            key={e.id}
+                            onClick={() => handleLists("status", e.id)}
+                            className="w-[259px] h-[46px] p-[14px] cursor-pointer"
                           >
-                            {e.name}
-                          </span>
-                        </div>
-                      );
-                    })}
+                            <span
+                              id={e.id}
+                              className="text-sm text-[#0d0f10] font-[300] leading-[17px] grow"
+                            >
+                              {e.name}
+                            </span>
+                          </div>
+                        );
+                      })}
                   </section>
                   <input
                     {...register("status_id")}
