@@ -25,13 +25,14 @@ const schema = yup.object().shape({
   status_id: yup.string().required("სტატუსის არჩევა სავალდებულოა"),
   department_id: yup.string().required("დეპარტამენტის არჩევა სავალდებულოა"),
   employee_id: yup.string().required("თანამშრომლის არჩევა სავალდებულოა"),
-  due_date: yup.date().notRequired(),
+  due_date: yup.string().notRequired(),
 });
 
 function CreateTask(props) {
   const token = "9e6c9438-0bca-4337-a267-f9a7fd99f68b";
   const apiUrl = (endpoint) =>
     `https://momentum.redberryinternship.ge/api/${endpoint}`;
+  const navigate = useNavigate();
   const [isSubmited, setSubmited] = useState(false);
   const [useData, setData] = useState({
     statuses: [],
@@ -271,15 +272,58 @@ function CreateTask(props) {
     setSelectedDate(chosenDate);
   };
 
-  const makeSubmit = () => {};
-
   const handleErrors = () => {
     console.log(isSubmited);
     if (!isSubmited) {
       setSubmited(true);
     }
   };
-  // console.log(useData["priorities"].find((e) => 3 == e.id).name);
+
+  const makeSubmit = (data) => {
+    let description = "";
+    if (data.description) {
+      description = data.description;
+    }
+
+    // if deadline is not chosen it sets tomorrow
+    const tomorrow = new Date(
+      today.getFullYear(),
+      today.getMonth(),
+      today.getDate() + 1
+    );
+    tomorrow.setUTCHours(tomorrow.getUTCHours() + 4);
+    let due_date = tomorrow.toISOString().replace("Z", "+04:00");
+    if (data.due_date) {
+      due_date = data.due_date;
+    }
+
+    const formData = new FormData();
+    formData.append("name", data.name);
+    formData.append("description", description);
+    formData.append("priority_id", data.priority_id);
+    formData.append("status_id", data.status_id);
+    formData.append("department_id", data.department_id);
+    formData.append("employee_id", data.employee_id);
+    formData.append("due_date", due_date);
+
+    const createTask = async () => {
+      const url = "https://momentum.redberryinternship.ge/api/tasks";
+      const token = "9e6c9438-0bca-4337-a267-f9a7fd99f68b";
+      try {
+        const response = await axios.post(url, formData, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            Accept: "application/json",
+          },
+        });
+      } catch (error) {
+        console.error("Error:", error);
+      }
+    };
+    createTask();
+    navigate("/");
+  };
+
   return (
     <main className="flex flex-col gap-[25px]">
       <h1 className="text-[34px] text-[#212529] font-[600] leading-[41px]">
@@ -808,7 +852,13 @@ function CreateTask(props) {
           </section>
         </section>
         <div className="flex items-center gap-6">
-          <button className="w-[120px] h-[42px] flex items-center justify-center rounded-[5px] border border-solid border-[#8338ec] text-base text-[#212529] cursor-pointer hover:border-[#B588F4]">
+          <button
+            className="w-[120px] h-[42px] flex items-center justify-center rounded-[5px] border border-solid border-[#8338ec] text-base text-[#212529] cursor-pointer hover:border-[#B588F4]"
+            onClick={(e) => {
+              e.preventDefault();
+              navigate("/");
+            }}
+          >
             გაუქმება
           </button>
           <button
