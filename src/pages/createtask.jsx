@@ -25,6 +25,7 @@ const schema = yup.object().shape({
   status_id: yup.string().required("სტატუსის არჩევა სავალდებულოა"),
   department_id: yup.string().required("დეპარტამენტის არჩევა სავალდებულოა"),
   employee_id: yup.string().required("თანამშრომლის არჩევა სავალდებულოა"),
+  due_date: yup.date().notRequired(),
 });
 
 function CreateTask(props) {
@@ -230,7 +231,9 @@ function CreateTask(props) {
 
   const handleApply = (e) => {
     e.preventDefault();
-    let inputValue = `${selectedDate.getDate()}.${selectedDate.getMonth()}.${selectedDate.getFullYear()}`;
+    let inputValue = `${selectedDate.getDate()}.${
+      selectedDate.getMonth() + 1
+    }.${selectedDate.getFullYear()}`;
 
     setDateValue(inputValue);
     setListings({
@@ -238,6 +241,23 @@ function CreateTask(props) {
       deadline: false,
     });
     setChosenDate(selectedDate);
+
+    // to utc+4
+    let dateValue = "";
+
+    let date = null;
+    // if user selects today it will sets deadline at 24:00 otherwise it does same but on the selected day
+    if (isToday(selectedDate.getDate())) {
+      date = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+    } else {
+      date = selectedDate;
+    }
+
+    date.setUTCHours(date.getUTCHours() + 4);
+
+    dateValue = date.toISOString().replace("Z", "+04:00");
+
+    setValue("due_date", dateValue);
   };
 
   const handleCancel = (e) => {
@@ -659,21 +679,13 @@ function CreateTask(props) {
                     listings.deadline ? "border-[#8338EC]" : "border-[#dee2e6]"
                   } w-[318px] h-[45px] flex items-center gap-[6px] px-[14px] rounded-[5px] border border-solid `}
                 >
-                  {/* <label htmlFor="deadline" className="formlabels mt-[6px]">
-                დედლაინი
-                  </label>
-                  <input
-                    type="date"
-                    name=""
-                    id="deadline"
-                    className="forminputs w-[318px] h-[45px] text-sm text-[#0D0F10] text-[#ADB5BD]"
-                  /> */}
                   <img
                     src="./Vector.png"
                     alt="date"
                     onClick={() => openList("deadline")}
                   />
                   <input
+                    {...register("due_date")}
                     type="text"
                     id="deadline"
                     placeholder="DD/MM/YYYY"
@@ -730,13 +742,32 @@ function CreateTask(props) {
                         { length: lastOfMonth.getDate() },
                         (_, index) => {
                           const day = index + 1;
+                          // validations for deadline are set here
+                          // it doesnt allow user to choose past dates
+                          const past = new Date(
+                            selectedDate.getFullYear(),
+                            selectedDate.getMonth(),
+                            day
+                          );
+                          const dayA = new Date(
+                            today.getFullYear(),
+                            today.getMonth(),
+                            today.getDate()
+                          );
+                          let isPast = past < dayA;
 
                           return (
                             <button
                               key={index}
-                              onClick={(e) => setDate(e, day)}
+                              onClick={
+                                isPast
+                                  ? (e) => e.preventDefault()
+                                  : (e) => setDate(e, day)
+                              }
                               className={`${
-                                selectedDate.getDate() === day
+                                isPast
+                                  ? "normal hover:bg-[#F93B1D] text-[#0d0f10] hover:text-[#fff] hover:opacity-60"
+                                  : selectedDate.getDate() === day
                                   ? "selected"
                                   : isToday(day)
                                   ? "normal border border-[#8338ec] hover:bg-[#8338ec] text-[#0d0f10] hover:text-[#fff] hover:opacity-60"
