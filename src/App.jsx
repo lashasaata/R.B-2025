@@ -14,7 +14,10 @@ function App() {
         {useSlicer ? <CreateEmployee setSlicer={setSlicer} /> : <></>}
         <Routes>
           <Route path="/" />
-          <Route path="/create_task" element={<CreateTask />} />
+          <Route
+            path="/create_task"
+            element={<CreateTask setSlicer={setSlicer} useSlicer={useSlicer} />}
+          />
         </Routes>
       </BrowserRouter>
     </main>

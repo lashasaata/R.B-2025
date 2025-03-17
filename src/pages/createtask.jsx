@@ -27,7 +27,7 @@ const schema = yup.object().shape({
   employee_id: yup.string().required("თანამშრომლის არჩევა სავალდებულოა"),
 });
 
-function CreateTask() {
+function CreateTask(props) {
   const token = "9e6c9438-0bca-4337-a267-f9a7fd99f68b";
   const apiUrl = (endpoint) =>
     `https://momentum.redberryinternship.ge/api/${endpoint}`;
@@ -63,7 +63,7 @@ function CreateTask() {
       }
     };
     fetchData();
-  }, []);
+  }, [props.useSlicer]);
 
   console.log(useData);
 
@@ -108,7 +108,11 @@ function CreateTask() {
 
   const handleLists = (listType, id) => {
     if (listType == "department" && ids.department_id != id) {
-      setValue(`employee_id`, undefined, { shouldValidate: true });
+      if (isSubmited) {
+        setValue(`employee_id`, undefined, { shouldValidate: true });
+      } else {
+        setValue(`employee_id`, undefined, { shouldValidate: false });
+      }
       setIds((prevIds) => ({
         ...prevIds,
         employee_id: 0,
@@ -126,6 +130,15 @@ function CreateTask() {
     setListings((prevListings) => ({
       ...prevListings,
       [listType]: false,
+    }));
+  };
+
+  const handleNewEmployee = () => {
+    props.setSlicer(true);
+
+    setListings((prevListings) => ({
+      ...prevListings,
+      employee: false,
     }));
   };
 
@@ -556,18 +569,33 @@ function CreateTask() {
                       : "rounded-[5px] border-[#dee2e6]"
                   } w-[550px] h-[45px] p-[14px] border border-solid  flex items-center justify-between relative cursor-pointer`}
                 >
-                  <span className="text-sm text-[#0d0f10] font-[300] leading-[17px] grow">
-                    {ids.employee_id == 0
-                      ? ""
-                      : (() => {
-                          const employee = useData.employees.find(
+                  <div className="flex items-center gap-[6px]">
+                    {ids.employee_id != 0 ? (
+                      <img
+                        src={
+                          useData.employees.filter(
                             (e) => ids.employee_id == e.id
-                          );
-                          return employee
-                            ? `${employee.name} ${employee.surname}`
-                            : "";
-                        })()}
-                  </span>
+                          )[0]?.avatar
+                        }
+                        alt="avatar"
+                        className="w-7 h-7 rounded-full"
+                      />
+                    ) : (
+                      ""
+                    )}
+                    <span className="text-sm text-[#0d0f10] font-[300] leading-[17px] grow">
+                      {ids.employee_id == 0
+                        ? ""
+                        : (() => {
+                            const employee = useData.employees.find(
+                              (e) => ids.employee_id == e.id
+                            );
+                            return employee
+                              ? `${employee.name} ${employee.surname}`
+                              : "";
+                          })()}
+                    </span>
+                  </div>
                   <img src="/icon-arrow-down.svg" alt="down" />
                 </div>
                 <section
@@ -577,7 +605,10 @@ function CreateTask() {
                       : "hidden"
                   } absolute w-full bg-[#fff] z-50 left-0 bottom-[1px] transform translate-y-full rounded-b-[5px]`}
                 >
-                  <div className="flex items-center gap-2 p-[14px] text-base text-[#8338EC] font-normal leading-[19px]">
+                  <div
+                    className="flex items-center gap-2 p-[14px] text-base text-[#8338EC] font-normal leading-[19px] cursor-pointer"
+                    onClick={handleNewEmployee}
+                  >
                     <div className="w-[18px] h-[18px] flex items-center justify-center rounded-full border border-solid border-[#8338EC]">
                       +
                     </div>
