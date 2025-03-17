@@ -21,6 +21,10 @@ const schema = yup.object().shape({
       return value.split(/\s+/).filter(Boolean).length >= 4;
     })
     .max(255, "მაქსიმუმ 255 სიმბოლო"),
+  priority_id: yup.string().required("პრიორიტეტის არჩევა სავალდებულოა"),
+  status_id: yup.string().required("სტატუსის არჩევა სავალდებულოა"),
+  department_id: yup.string().required("დეპარტამენტის არჩევა სავალდებულოა"),
+  employee_id: yup.string().required("თანამშრომლის არჩევა სავალდებულოა"),
 });
 
 function CreateTask() {
@@ -103,10 +107,21 @@ function CreateTask() {
   };
 
   const handleLists = (listType, id) => {
-    setIds((prevIds) => ({
-      ...prevIds,
-      [`${listType}_id`]: id,
-    }));
+    if (listType == "department" && ids.department_id != id) {
+      setValue(`employee_id`, undefined, { shouldValidate: true });
+      setIds((prevIds) => ({
+        ...prevIds,
+        employee_id: 0,
+        [`${listType}_id`]: id,
+      }));
+    } else {
+      setIds((prevIds) => ({
+        ...prevIds,
+        [`${listType}_id`]: id,
+      }));
+    }
+
+    setValue(`${listType}_id`, id, { shouldValidate: true });
 
     setListings((prevListings) => ({
       ...prevListings,
@@ -336,7 +351,7 @@ function CreateTask() {
                     className={`${
                       listings.priority
                         ? "border-b-0 rounded-t-[5px] border-[#8338EC]"
-                        : errors.priority
+                        : errors.priority_id
                         ? "rounded-[5px] border-[#F93B1D]"
                         : "rounded-[5px] border-[#dee2e6]"
                     } w-[259px] h-[46px] p-[14px] border border-solid  flex items-center justify-between relative cursor-pointer`}
@@ -420,7 +435,7 @@ function CreateTask() {
                     className={`${
                       listings.status
                         ? "border-b-0 rounded-t-[5px] border-[#8338EC]"
-                        : errors.status
+                        : errors.status_id
                         ? "rounded-[5px] border-[#F93B1D]"
                         : "rounded-[5px] border-[#dee2e6]"
                     } w-[259px] h-[46px] p-[14px] border border-solid  flex items-center justify-between relative cursor-pointer`}
@@ -479,7 +494,7 @@ function CreateTask() {
                   className={`${
                     listings.department
                       ? "border-b-0 rounded-t-[5px] border-[#8338EC]"
-                      : errors.department
+                      : errors.department_id
                       ? "rounded-[5px] border-[#F93B1D]"
                       : "rounded-[5px] border-[#dee2e6]"
                   } w-[550px] h-[45px] p-[14px] border border-solid  flex items-center justify-between relative cursor-pointer`}
@@ -536,7 +551,7 @@ function CreateTask() {
                   className={`${
                     listings.employee
                       ? "border-b-0 rounded-t-[5px] border-[#8338EC]"
-                      : errors.employee
+                      : errors.employee_id
                       ? "rounded-[5px] border-[#F93B1D]"
                       : "rounded-[5px] border-[#dee2e6]"
                   } w-[550px] h-[45px] p-[14px] border border-solid  flex items-center justify-between relative cursor-pointer`}
@@ -632,6 +647,7 @@ function CreateTask() {
                     id="deadline"
                     placeholder="DD/MM/YYYY"
                     value={dateValue}
+                    readOnly
                     className="outline-none w-[268px] text-sm text-[#0d0f10] leading-[1.43] tracking-[-0.18px] placeholder:text-[adb5bd] plceholder:text-sm placeholder:leading-[20px] placeholer:tracking-[-0.18px]"
                   />
                 </div>
