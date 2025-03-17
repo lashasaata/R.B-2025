@@ -4,6 +4,7 @@ import Header from "./components/header";
 import CreateTask from "./pages/createtask";
 import { useState } from "react";
 import CreateEmployee from "./components/createEmployee";
+import Home from "./pages/home";
 
 function App() {
   const [useSlicer, setSlicer] = useState(false);
@@ -13,7 +14,7 @@ function App() {
         <Header setSlicer={setSlicer} />
         {useSlicer ? <CreateEmployee setSlicer={setSlicer} /> : <></>}
         <Routes>
-          <Route path="/" />
+          <Route path="/" element={<Home />} />
           <Route
             path="/create_task"
             element={<CreateTask setSlicer={setSlicer} useSlicer={useSlicer} />}
