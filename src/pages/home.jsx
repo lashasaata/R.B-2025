@@ -263,7 +263,560 @@ function Home() {
           </button>
         </section>
       </section>
-      <section></section>
+      <section className="flex gap-[52px]">
+        <section className="flex flex-col gap-[30px]">
+          <header className="w-[381px] h-[54px] flex items-center justify-center rounded-[10px] bg-[#f7bc30] text-[20px] text-[#fff] leading-[24px] font-500 cursor-pointer">
+            დასაწყები
+          </header>
+          {filteredData.toDos.map((e) => {
+            let department = e.department.name;
+            department = department.split(" ");
+
+            if (e.department.name == "ტექნოლოგიების დეპარტამენტი") {
+              department = "ინფ. ტექ.";
+            } else if (department.length == 2) {
+              department = department[0];
+            } else if (department.length == 3) {
+              department =
+                department[0].slice(0, 4) +
+                ". " +
+                department[1].slice(0, 4) +
+                ".";
+            } else {
+              department =
+                department[0].slice(0, 5) +
+                ". " +
+                department[2].slice(0, 5) +
+                ".";
+            }
+
+            const date = new Date(e.due_date);
+
+            const georgianMonths = [
+              "იანვ",
+              "თებე",
+              "მარტ",
+              "აპრი",
+              "მაის",
+              "ივნის",
+              "ივლის",
+              "აგვი",
+              "სექტ",
+              "ოქტო",
+              "ნოემ",
+              "დეკე",
+            ];
+
+            const day = date.getDate().toString().padStart(2, "0");
+            const month = georgianMonths[date.getMonth()];
+            const year = date.getFullYear();
+
+            const formattedDate = `${day} ${month}, ${year}`;
+
+            const title = e.name;
+            if (title.length > 50) {
+              title = title.slice(0, 50) + "...";
+            }
+
+            const description = e.description;
+            if (title.length > 100) {
+              title = title.slice(0, 100) + "...";
+            }
+            return (
+              <section className="w-[381px] min-h-[202px] flex flex-col justify-between gap-7 p-5 rounded-[15px] border border-[#f7bc30] bg-[#fff]">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-[10px]">
+                    <div
+                      key={e.id}
+                      className={`${
+                        e.priority.name == "დაბალი"
+                          ? "border-[#08a508]"
+                          : e.priority.name == "საშუალო"
+                          ? "border-[#ffbe0b]"
+                          : "border-[#fa4d4d]"
+                      } w-[86px] h-[26px] flex items-center justify-center gap-1 p-1 rounded-[5px] border-[0.5px] bg-[#fff]`}
+                    >
+                      <img src={e.priority.icon} alt="" />
+                      <span
+                        className={`${
+                          e.priority.name == "დაბალი"
+                            ? "text-[#08a508]"
+                            : e.priority.name == "საშუალო"
+                            ? "text-[#ffbe0b]"
+                            : "text-[#fa4d4d]"
+                        } text-xs font-500 leading-[1.5]`}
+                      >
+                        {e.priority.name}
+                      </span>
+                    </div>
+                    <div
+                      className={`${
+                        e.department.name == "მედიის დეპარტამენტი"
+                          ? "bg-[#ff66a8]"
+                          : e.department.name == "ტექნოლოგიების დეპარტამენტი"
+                          ? "bg-[#ffd86d]"
+                          : e.department.name == "ლოჯოსტიკის დეპარტამენტი"
+                          ? "bg-[#89b6ff]"
+                          : e.department.name ==
+                            "გაყიდვები და მარკეტინგის დეპარტამენტი"
+                          ? "bg-[#0b6e0b]"
+                          : e.department.name == "ფინანსების დეპარტამენტი"
+                          ? "bg-[#fa4d4d]"
+                          : e.department.name ==
+                            "ადამიანური რესურსების დეპარტამენტი"
+                          ? "bg-[#b31a59]"
+                          : e.department.name == "ადმინისტრაციის დეპარტამენტი"
+                          ? "bg-[#34989d]"
+                          : ""
+                      } px-[10px] py-[5px] rounded-[15px] text-xs text-[#fff] leading-[14px] grow-[0]`}
+                    >
+                      {department}
+                    </div>
+                  </div>
+                  <span className="text-xs text-[#212529] leading-[14px]">
+                    {formattedDate}
+                  </span>
+                </div>
+                <div className="flex flex-col gap-3 px-[10.5px]">
+                  <h3 className="text-[15px] text-[#212529] leading-[18px] font-medium">
+                    {title}
+                  </h3>
+                  <p className="text-sm text-[#343a40] leading-[17px]">
+                    {description}
+                  </p>
+                </div>
+                <div className="flex items-center justify-between">
+                  <img
+                    src={e.employee.avatar}
+                    alt="avatar"
+                    className="w-[31px] h-[31px] rounded-full"
+                  />
+                  <div className="flex items-center gap-[5px]">
+                    <img src="./Comments.png" alt="comments" />
+                    <span className="text-sm text-[#212529] leading-[17px]">
+                      {e.total_comments}
+                    </span>
+                  </div>
+                </div>
+              </section>
+            );
+          })}
+        </section>
+        <section className="flex flex-col gap-[30px]">
+          <header className="w-[381px] h-[54px] flex items-center justify-center rounded-[10px] bg-[#fb5607] text-[20px] text-[#fff] leading-[24px] font-500 cursor-pointer">
+            პროგრესში
+          </header>
+          {filteredData.inProgress.map((e) => {
+            let department = e.department.name;
+            department = department.split(" ");
+
+            if (e.department.name == "ტექნოლოგიების დეპარტამენტი") {
+              department = "ინფ. ტექ.";
+            } else if (department.length == 2) {
+              department = department[0];
+            } else if (department.length == 3) {
+              department =
+                department[0].slice(0, 4) +
+                ". " +
+                department[1].slice(0, 4) +
+                ".";
+            } else {
+              department =
+                department[0].slice(0, 5) +
+                ". " +
+                department[2].slice(0, 5) +
+                ".";
+            }
+
+            const date = new Date(e.due_date);
+
+            const georgianMonths = [
+              "იანვ",
+              "თებე",
+              "მარტ",
+              "აპრი",
+              "მაის",
+              "ივნის",
+              "ივლის",
+              "აგვი",
+              "სექტ",
+              "ოქტო",
+              "ნოემ",
+              "დეკე",
+            ];
+
+            const day = date.getDate().toString().padStart(2, "0");
+            const month = georgianMonths[date.getMonth()];
+            const year = date.getFullYear();
+
+            const formattedDate = `${day} ${month}, ${year}`;
+
+            const title = e.name;
+            if (title.length > 50) {
+              title = title.slice(0, 50) + "...";
+            }
+
+            const description = e.description;
+            if (title.length > 100) {
+              title = title.slice(0, 100) + "...";
+            }
+            return (
+              <section className="w-[381px] min-h-[202px] flex flex-col justify-between gap-7 p-5 rounded-[15px] border border-[#fb5607] bg-[#fff]">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-[10px]">
+                    <div
+                      key={e.id}
+                      className={`${
+                        e.priority.name == "დაბალი"
+                          ? "border-[#08a508]"
+                          : e.priority.name == "საშუალო"
+                          ? "border-[#ffbe0b]"
+                          : "border-[#fa4d4d]"
+                      } w-[86px] h-[26px] flex items-center justify-center gap-1 p-1 rounded-[5px] border-[0.5px] bg-[#fff]`}
+                    >
+                      <img src={e.priority.icon} alt="" />
+                      <span
+                        className={`${
+                          e.priority.name == "დაბალი"
+                            ? "text-[#08a508]"
+                            : e.priority.name == "საშუალო"
+                            ? "text-[#ffbe0b]"
+                            : "text-[#fa4d4d]"
+                        } text-xs font-500 leading-[1.5]`}
+                      >
+                        {e.priority.name}
+                      </span>
+                    </div>
+                    <div
+                      className={`${
+                        e.department.name == "მედიის დეპარტამენტი"
+                          ? "bg-[#ff66a8]"
+                          : e.department.name == "ტექნოლოგიების დეპარტამენტი"
+                          ? "bg-[#ffd86d]"
+                          : e.department.name == "ლოჯოსტიკის დეპარტამენტი"
+                          ? "bg-[#89b6ff]"
+                          : e.department.name ==
+                            "გაყიდვები და მარკეტინგის დეპარტამენტი"
+                          ? "bg-[#0b6e0b]"
+                          : e.department.name == "ფინანსების დეპარტამენტი"
+                          ? "bg-[#fa4d4d]"
+                          : e.department.name ==
+                            "ადამიანური რესურსების დეპარტამენტი"
+                          ? "bg-[#b31a59]"
+                          : e.department.name == "ადმინისტრაციის დეპარტამენტი"
+                          ? "bg-[#34989d]"
+                          : ""
+                      } px-[10px] py-[5px] rounded-[15px] text-xs text-[#fff] leading-[14px] grow-[0]`}
+                    >
+                      {department}
+                    </div>
+                  </div>
+                  <span className="text-xs text-[#212529] leading-[14px]">
+                    {formattedDate}
+                  </span>
+                </div>
+                <div className="flex flex-col gap-3 px-[10.5px]">
+                  <h3 className="text-[15px] text-[#212529] leading-[18px] font-medium">
+                    {title}
+                  </h3>
+                  <p className="text-sm text-[#343a40] leading-[17px]">
+                    {description}
+                  </p>
+                </div>
+                <div className="flex items-center justify-between">
+                  <img
+                    src={e.employee.avatar}
+                    alt="avatar"
+                    className="w-[31px] h-[31px] rounded-full"
+                  />
+                  <div className="flex items-center gap-[5px]">
+                    <img src="./Comments.png" alt="comments" />
+                    <span className="text-sm text-[#212529] leading-[17px]">
+                      {e.total_comments}
+                    </span>
+                  </div>
+                </div>
+              </section>
+            );
+          })}
+        </section>
+        <section className="flex flex-col gap-[30px]">
+          <header className="w-[381px] h-[54px] flex items-center justify-center rounded-[10px] bg-[#ff006e] text-[20px] text-[#fff] leading-[24px] font-500 cursor-pointer">
+            მზად ტესტირებისთვის
+          </header>
+          {filteredData.forTesting.map((e) => {
+            let department = e.department.name;
+            department = department.split(" ");
+
+            if (e.department.name == "ტექნოლოგიების დეპარტამენტი") {
+              department = "ინფ. ტექ.";
+            } else if (department.length == 2) {
+              department = department[0];
+            } else if (department.length == 3) {
+              department =
+                department[0].slice(0, 4) +
+                ". " +
+                department[1].slice(0, 4) +
+                ".";
+            } else {
+              department =
+                department[0].slice(0, 5) +
+                ". " +
+                department[2].slice(0, 5) +
+                ".";
+            }
+
+            const date = new Date(e.due_date);
+
+            const georgianMonths = [
+              "იანვ",
+              "თებე",
+              "მარტ",
+              "აპრი",
+              "მაის",
+              "ივნის",
+              "ივლის",
+              "აგვი",
+              "სექტ",
+              "ოქტო",
+              "ნოემ",
+              "დეკე",
+            ];
+
+            const day = date.getDate().toString().padStart(2, "0");
+            const month = georgianMonths[date.getMonth()];
+            const year = date.getFullYear();
+
+            const formattedDate = `${day} ${month}, ${year}`;
+
+            const title = e.name;
+            if (title.length > 50) {
+              title = title.slice(0, 50) + "...";
+            }
+
+            const description = e.description;
+            if (title.length > 100) {
+              title = title.slice(0, 100) + "...";
+            }
+            return (
+              <section className="w-[381px] min-h-[202px] flex flex-col justify-between gap-7 p-5 rounded-[15px] border border-[#ff006e] bg-[#fff]">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-[10px]">
+                    <div
+                      key={e.id}
+                      className={`${
+                        e.priority.name == "დაბალი"
+                          ? "border-[#08a508]"
+                          : e.priority.name == "საშუალო"
+                          ? "border-[#ffbe0b]"
+                          : "border-[#fa4d4d]"
+                      } w-[86px] h-[26px] flex items-center justify-center gap-1 p-1 rounded-[5px] border-[0.5px] bg-[#fff]`}
+                    >
+                      <img src={e.priority.icon} alt="" />
+                      <span
+                        className={`${
+                          e.priority.name == "დაბალი"
+                            ? "text-[#08a508]"
+                            : e.priority.name == "საშუალო"
+                            ? "text-[#ffbe0b]"
+                            : "text-[#fa4d4d]"
+                        } text-xs font-500 leading-[1.5]`}
+                      >
+                        {e.priority.name}
+                      </span>
+                    </div>
+                    <div
+                      className={`${
+                        e.department.name == "მედიის დეპარტამენტი"
+                          ? "bg-[#ff66a8]"
+                          : e.department.name == "ტექნოლოგიების დეპარტამენტი"
+                          ? "bg-[#ffd86d]"
+                          : e.department.name == "ლოჯოსტიკის დეპარტამენტი"
+                          ? "bg-[#89b6ff]"
+                          : e.department.name ==
+                            "გაყიდვები და მარკეტინგის დეპარტამენტი"
+                          ? "bg-[#0b6e0b]"
+                          : e.department.name == "ფინანსების დეპარტამენტი"
+                          ? "bg-[#fa4d4d]"
+                          : e.department.name ==
+                            "ადამიანური რესურსების დეპარტამენტი"
+                          ? "bg-[#b31a59]"
+                          : e.department.name == "ადმინისტრაციის დეპარტამენტი"
+                          ? "bg-[#34989d]"
+                          : ""
+                      } px-[10px] py-[5px] rounded-[15px] text-xs text-[#fff] leading-[14px] grow-[0]`}
+                    >
+                      {department}
+                    </div>
+                  </div>
+                  <span className="text-xs text-[#212529] leading-[14px]">
+                    {formattedDate}
+                  </span>
+                </div>
+                <div className="flex flex-col gap-3 px-[10.5px]">
+                  <h3 className="text-[15px] text-[#212529] leading-[18px] font-medium">
+                    {title}
+                  </h3>
+                  <p className="text-sm text-[#343a40] leading-[17px]">
+                    {description}
+                  </p>
+                </div>
+                <div className="flex items-center justify-between">
+                  <img
+                    src={e.employee.avatar}
+                    alt="avatar"
+                    className="w-[31px] h-[31px] rounded-full"
+                  />
+                  <div className="flex items-center gap-[5px]">
+                    <img src="./Comments.png" alt="comments" />
+                    <span className="text-sm text-[#212529] leading-[17px]">
+                      {e.total_comments}
+                    </span>
+                  </div>
+                </div>
+              </section>
+            );
+          })}
+        </section>
+        <section className="flex flex-col gap-[30px]">
+          <header className="w-[381px] h-[54px] flex items-center justify-center rounded-[10px] bg-[#3a86ff] text-[20px] text-[#fff] leading-[24px] font-500 cursor-pointer">
+            დასრულებული
+          </header>
+          {filteredData.completed.map((e) => {
+            let department = e.department.name;
+            department = department.split(" ");
+
+            if (e.department.name == "ტექნოლოგიების დეპარტამენტი") {
+              department = "ინფ. ტექ.";
+            } else if (department.length == 2) {
+              department = department[0];
+            } else if (department.length == 3) {
+              department =
+                department[0].slice(0, 4) +
+                ". " +
+                department[1].slice(0, 4) +
+                ".";
+            } else {
+              department =
+                department[0].slice(0, 5) +
+                ". " +
+                department[2].slice(0, 5) +
+                ".";
+            }
+
+            const date = new Date(e.due_date);
+
+            const georgianMonths = [
+              "იანვ",
+              "თებე",
+              "მარტ",
+              "აპრი",
+              "მაის",
+              "ივნის",
+              "ივლის",
+              "აგვი",
+              "სექტ",
+              "ოქტო",
+              "ნოემ",
+              "დეკე",
+            ];
+
+            const day = date.getDate().toString().padStart(2, "0");
+            const month = georgianMonths[date.getMonth()];
+            const year = date.getFullYear();
+
+            const formattedDate = `${day} ${month}, ${year}`;
+
+            const title = e.name;
+            if (title.length > 50) {
+              title = title.slice(0, 50) + "...";
+            }
+
+            const description = e.description;
+            if (title.length > 100) {
+              title = title.slice(0, 100) + "...";
+            }
+            return (
+              <section className="w-[381px] min-h-[202px] flex flex-col justify-between gap-7 p-5 rounded-[15px] border border-[#3a86ff] bg-[#fff]">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-[10px]">
+                    <div
+                      key={e.id}
+                      className={`${
+                        e.priority.name == "დაბალი"
+                          ? "border-[#08a508]"
+                          : e.priority.name == "საშუალო"
+                          ? "border-[#ffbe0b]"
+                          : "border-[#fa4d4d]"
+                      } w-[86px] h-[26px] flex items-center justify-center gap-1 p-1 rounded-[5px] border-[0.5px] bg-[#fff]`}
+                    >
+                      <img src={e.priority.icon} alt="" />
+                      <span
+                        className={`${
+                          e.priority.name == "დაბალი"
+                            ? "text-[#08a508]"
+                            : e.priority.name == "საშუალო"
+                            ? "text-[#ffbe0b]"
+                            : "text-[#fa4d4d]"
+                        } text-xs font-500 leading-[1.5]`}
+                      >
+                        {e.priority.name}
+                      </span>
+                    </div>
+                    <div
+                      className={`${
+                        e.department.name == "მედიის დეპარტამენტი"
+                          ? "bg-[#ff66a8]"
+                          : e.department.name == "ტექნოლოგიების დეპარტამენტი"
+                          ? "bg-[#ffd86d]"
+                          : e.department.name == "ლოჯოსტიკის დეპარტამენტი"
+                          ? "bg-[#89b6ff]"
+                          : e.department.name ==
+                            "გაყიდვები და მარკეტინგის დეპარტამენტი"
+                          ? "bg-[#0b6e0b]"
+                          : e.department.name == "ფინანსების დეპარტამენტი"
+                          ? "bg-[#fa4d4d]"
+                          : e.department.name ==
+                            "ადამიანური რესურსების დეპარტამენტი"
+                          ? "bg-[#b31a59]"
+                          : e.department.name == "ადმინისტრაციის დეპარტამენტი"
+                          ? "bg-[#34989d]"
+                          : ""
+                      } px-[10px] py-[5px] rounded-[15px] text-xs text-[#fff] leading-[14px] grow-[0]`}
+                    >
+                      {department}
+                    </div>
+                  </div>
+                  <span className="text-xs text-[#212529] leading-[14px]">
+                    {formattedDate}
+                  </span>
+                </div>
+                <div className="flex flex-col gap-3 px-[10.5px]">
+                  <h3 className="text-[15px] text-[#212529] leading-[18px] font-medium">
+                    {title}
+                  </h3>
+                  <p className="text-sm text-[#343a40] leading-[17px]">
+                    {description}
+                  </p>
+                </div>
+                <div className="flex items-center justify-between">
+                  <img
+                    src={e.employee.avatar}
+                    alt="avatar"
+                    className="w-[31px] h-[31px] rounded-full"
+                  />
+                  <div className="flex items-center gap-[5px]">
+                    <img src="./Comments.png" alt="comments" />
+                    <span className="text-sm text-[#212529] leading-[17px]">
+                      {e.total_comments}
+                    </span>
+                  </div>
+                </div>
+              </section>
+            );
+          })}
+        </section>
+      </section>
     </main>
   );
 }
