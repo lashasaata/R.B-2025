@@ -52,7 +52,7 @@ function Home() {
   console.log(useListing);
 
   // FINDS which filter section is open
-  const findKeyByValue = (obj, value) => {
+  const findKeyByValue = (obj, value = true) => {
     return Object.keys(obj).find((key) => obj[key] === value);
   };
 
@@ -63,9 +63,109 @@ function Home() {
       employees: false,
       [listType]: !prevListings[listType],
     }));
+
+    setSelectedBoxes(chosenBoxes);
   };
 
-  console.log(typeof findKeyByValue(useListing, true));
+  const [filteredData, setFilteredData] = useState({
+    toDos: [],
+    inProgress: [],
+    forTesting: [],
+    completed: [],
+  });
+
+  useEffect(() => {
+    apply();
+  }, [useData.tasks]);
+
+  const [chosenBoxes, setChosenBoxes] = useState({
+    departments: [],
+    priorities: [],
+    employees: [],
+  });
+  const [selectedBoxes, setSelectedBoxes] = useState({
+    departments: [],
+    priorities: [],
+    employees: [],
+  });
+
+  const handleFilter = (field, id) => {
+    if (selectedBoxes[field].includes(id)) {
+      if (field == "employees") {
+        setSelectedBoxes({
+          ...selectedBoxes,
+          [field]: [],
+        });
+      } else {
+        setSelectedBoxes({
+          ...selectedBoxes,
+          [field]: selectedBoxes[field].filter((item) => item !== id),
+        });
+      }
+    } else {
+      if (field == "employees") {
+        setSelectedBoxes({
+          ...selectedBoxes,
+          [field]: [id],
+        });
+      } else {
+        setSelectedBoxes({
+          ...selectedBoxes,
+          [field]: [...selectedBoxes[field], id],
+        });
+      }
+    }
+  };
+
+  const apply = () => {
+    let idsForFilter = structuredClone(selectedBoxes);
+
+    Object.entries(idsForFilter).forEach(([key, value]) => {
+      if (value.length === 0) {
+        idsForFilter[key] = useData[key]?.map((item) => item.id);
+      }
+    });
+
+    let filterdata = {
+      toDos: [],
+      inProgress: [],
+      forTesting: [],
+      completed: [],
+    };
+
+    useData.tasks.forEach((task) => {
+      if (
+        idsForFilter.departments.includes(task.department.id) &&
+        idsForFilter.priorities.includes(task.priority.id) &&
+        idsForFilter.employees.includes(task.employee.id)
+      ) {
+        let status = "";
+
+        switch (task.status.id) {
+          case 1:
+            status = "toDos";
+            break;
+          case 2:
+            status = "inProgress";
+            break;
+          case 3:
+            status = "forTesting";
+            break;
+          case 4:
+            status = "completed";
+            break;
+          default:
+            console.warn("Unknown status:", task.status.id);
+        }
+
+        filterdata[status].push(task);
+      }
+    });
+
+    setChosenBoxes(selectedBoxes);
+    setFilteredData(filterdata);
+  };
+
   return (
     <main className="flex flex-col gap-[52px]">
       <h1 className="text-[34px] text-[#212529] font-[600] leading-[41px]">
@@ -108,7 +208,7 @@ function Home() {
         >
           <div className="flex flex-col gap-[22px]">
             {useData[findKeyByValue(useListing, true)]?.map((e) => {
-              let chosenSection = findKeyByValue(useListing, true);
+              let chosenSection = findKeyByValue(useListing);
               console.log(e.id);
               return (
                 <div key={e.id} className="flex items-center gap-[15px]">
@@ -124,11 +224,15 @@ function Home() {
                         ? "border-[#212529]"
                         : "border-[#8338ec]"
                     } outline-none w-[22px] h-[22px] flex items-center justify-center rounded-[6px] border-[1.5px] `}
+                    onClick={() => handleFilter(chosenSection, e.id)}
                   >
-                    {chosenSection == "departments" ? (
+                    {chosenSection == "departments" &&
+                    selectedBoxes.departments.includes(e.id) ? (
                       <img src="./check.svg" alt="check" />
-                    ) : (
+                    ) : selectedBoxes[chosenSection].includes(e.id) ? (
                       <img src="./Vector (1).png" alt="check" />
+                    ) : (
+                      ""
                     )}
                   </div>
                   <div className="flex items-center gap-[10px] text-base text-[#212529] leading-[19px]">
@@ -151,7 +255,10 @@ function Home() {
               );
             })}
           </div>
-          <button className="flex items-center justify-center self-end w-[155px] h-[35px] rounded-[20px] bg-[#8338ec] text-base text-[#fff] leading-[19px] cursor-pointer hover:bg-[#B588F4]">
+          <button
+            className="flex items-center justify-center self-end w-[155px] h-[35px] rounded-[20px] bg-[#8338ec] text-base text-[#fff] leading-[19px] cursor-pointer hover:bg-[#B588F4]"
+            onClick={apply}
+          >
             არჩევა
           </button>
         </section>
