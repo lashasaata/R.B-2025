@@ -7,9 +7,16 @@ import { TaskContext } from "../context/TaskProvider";
 function TaskDetail() {
   const data = useContext(TaskContext);
   const { taskId } = useParams();
+  const safeTaskId = taskId || "";
   const navigate = useNavigate();
 
-  const [useTask, setTask] = useState();
+  const [useTask, setTask] = useState(null);
+  const [statuses, setStatuses] = useState([]);
+  const [useStatus, setUseStatus] = useState({
+    name: "",
+    status_id: 0,
+  });
+  const [status, openStatus] = useState(false);
 
   console.log(useTask);
 
@@ -21,39 +28,67 @@ function TaskDetail() {
             Authorization: `Bearer ${data.TOKEN}`,
           },
         });
-
+        const statusesResponse = await axios.get(data.apiUrl(`/statuses`));
+        setStatuses(statusesResponse.data);
+        setUseStatus({
+          status_id: taskResponse.data.status.id,
+        });
         setTask(taskResponse.data);
       } catch (error) {
         console.log("Error while fetching task:", error);
       }
     };
     fetchTask();
-  }, []);
+  }, [safeTaskId]);
+
+  useEffect(() => {
+    const putStatus = async () => {
+      try {
+        const statusResponse = await axios.put(
+          data.apiUrl(`/tasks/${taskId}`),
+          {
+            status_id: useStatus.status_id,
+          },
+          {
+            headers: {
+              Authorization: `Bearer ${data.TOKEN}`,
+            },
+          }
+        );
+        console.log(statusResponse);
+      } catch (error) {
+        console.log("Failed posting status:", error);
+      }
+    };
+
+    putStatus();
+  }, [useStatus]);
+
+  const handleStatus = (name, id) => {
+    setUseStatus({
+      name: name,
+      status_id: id,
+    });
+    openStatus(false);
+  };
 
   console.log(useTask);
-  //   const getDepName = () => {
-  //     if (useTask) {
-  //       let department = useTask?.department.name;
-  //       department = department.split(" ");
 
-  //       if (useTask?.department.name == "ტექნოლოგიების დეპარტამენტი") {
-  //         department = "ინფ. ტექ.";
-  //       } else if (department.length == 2) {
-  //         department = department[0];
-  //       } else if (department.length == 3) {
-  //         department =
-  //           department[0].slice(0, 4) + ". " + department[1].slice(0, 4) + ".";
-  //       } else {
-  //         department =
-  //           department[0].slice(0, 5) + ". " + department[2].slice(0, 5) + ".";
-  //       }
-  //       return department;
-  //     }
-  //     return "dizaini";
-  //   };
-  const [useStatus, setUseStatus] = useState(false);
+  const date = new Date(useTask?.due_date);
 
-  console.log(data?.statuses);
+  const georgianDays = ["ორშ", "სამ", "ოთხ", "ხუთ", "პარ", "შაბ", "კვი"];
+
+  const weekDay = date.getDay();
+  const day = date.getDate().toString().padStart(2, "0");
+  const month = date.getMonth();
+  const year = date.getFullYear();
+
+  const formattedDate = `${georgianDays[weekDay - 1]} - ${day}/${
+    month + 1
+  }/${year}`;
+
+  console.log(date);
+
   return (
     <main className="flex justify-between">
       {useTask ? (
@@ -118,13 +153,13 @@ function TaskDetail() {
                 {useTask.description}
               </p>
             </section>
-            <section className="w-[493px] flex flex-col gap-7">
+            <section className="w-[520px] flex flex-col gap-7">
               <h4 className="text-2xl text-[#2a2a2a] leading-[29px] font-semibold">
                 დავალების დეტალები
               </h4>
               <section className="flex flex-col">
-                <div className="h-[70px] flex items-center justify-between">
-                  <div className="flex items-center gap-[6px]">
+                <div className="h-[70px] flex items-center gap-[70px]">
+                  <div className="w-[164px] flex items-center gap-[6px]">
                     <img src="/pie-chart.png" alt="pie-chart" />
                     <span className="text-base text-[#474747] leading-[1.5]">
                       სტატუსი
@@ -132,34 +167,34 @@ function TaskDetail() {
                   </div>
                   <div className="relative">
                     <div
-                      // onClick={() => openList("status")}
+                      onClick={() => openStatus(!status)}
                       className={`${
-                        useStatus
+                        status
                           ? "border-b-0 rounded-t-[5px] border-[#8338EC]"
                           : "rounded-[5px] border-[#dee2e6]"
                       } w-[259px] h-[46px] p-[14px] border border-solid  flex items-center justify-between relative cursor-pointer`}
                     >
                       <span className="text-sm text-[#0d0f10] font-[300] leading-[17px] grow">
-                        {useTask.status.name}
+                        {useStatus.name ? useStatus.name : useTask.status.name}
                       </span>
-                      {useStatus ? (
-                        <img src="./arrow-up-v.png" alt="" />
+                      {status ? (
+                        <img src="/arrow-up-v.png" alt="close" />
                       ) : (
-                        <img src="./arrow-down-b.png" alt="" />
+                        <img src="/arrow-down-b.png" alt="open" />
                       )}
                     </div>
                     <section
                       className={`${
-                        useStatus
+                        status
                           ? "flex flex-col border-b border-r border-l rounded-b-[5px] border-[#8338EC]"
                           : "hidden"
                       } absolute w-full bg-[#fff] z-50 left-0 bottom-[1px] transform translate-y-full rounded-b-[5px]`}
                     >
-                      {data.statuses?.map((e) => {
+                      {statuses?.map((e) => {
                         return (
                           <div
                             key={e.id}
-                            // onClick={() => handleLists("status", e.id)}
+                            onClick={() => handleStatus(e.name, e.id)}
                             className="w-[259px] h-[46px] p-[14px] cursor-pointer"
                           >
                             <span
@@ -174,23 +209,37 @@ function TaskDetail() {
                     </section>
                   </div>
                 </div>
-                <div className="h-[70px] flex items-center justify-between">
-                  <div className="flex items-center gap-[6px]">
+                <div className="h-[70px] flex items-center gap-[70px]">
+                  <div className="w-[164px] flex items-center gap-[6px]">
                     <img src="/Frame 1000005864.png" alt="user" />
-                    <span className="text-base text-[#474747] leading-[1.5]"></span>
+                    <span className="text-base text-[#474747] leading-[1.5]">
+                      თანამშრომელი
+                    </span>
                   </div>
-                  <div>
-                    <img src="" alt="" />
-                    <span></span>
-                    <span></span>
+                  <div className="w-[270px] relative flex items-center gap-3">
+                    <img
+                      src={useTask.employee.avatar}
+                      alt="avatar"
+                      className="w-8 h-8 rounded-full"
+                    />
+                    <span className="text-sm text-[#0d0f10] leading-[1.5]">
+                      {useTask.employee.name} {useTask.employee.surname}
+                    </span>
+                    <span className="absolute left-[43px] top-[-9px] text-[11px] text-[#474747] leading-[13px] font-300">
+                      {useTask.employee.department.name}
+                    </span>
                   </div>
                 </div>
-                <div className="h-[70px] flex items-center justify-between">
-                  <div className="flex items-center gap-[6px]">
+                <div className="h-[70px] flex items-center gap-[70px]">
+                  <div className="w-[164px] flex items-center gap-[6px]">
                     <img src="/calendar.png" alt="date" />
-                    <span className="text-base text-[#474747] leading-[1.5]"></span>
+                    <span className="text-base text-[#474747] leading-[1.5]">
+                      დავალების ვადა
+                    </span>
                   </div>
-                  <span></span>
+                  <span className="text-sm text-[#0d0f10] leading-[1.5] font-medium">
+                    {formattedDate}
+                  </span>
                 </div>
               </section>
             </section>
