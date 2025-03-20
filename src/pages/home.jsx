@@ -170,6 +170,11 @@ function Home() {
     setFilterBoxes(boxes);
     setChosenBoxes(boxes);
     setFilteredData(filterdata);
+    setListing({
+      departments: false,
+      priorities: false,
+      employees: false,
+    });
   };
 
   const clearFilter = () => {
@@ -191,38 +196,75 @@ function Home() {
     apply(newBoxes);
   };
 
+  // const closeLists = () => {
+  //   if (Object.values(useListing).some((e) => e === true)) {
+  //     setListing({
+  //       departments: false,
+  //       priorities: false,
+  //       employees: false,
+  //     });
+  //   }
+  // };
+
   return (
-    <main className="flex flex-col gap-[52px]">
+    <main
+      className="flex flex-col gap-[52px]"
+      // onClick={closeLists}
+    >
       <h1 className="text-[34px] text-[#212529] font-[600] leading-[41px]">
         დავალებების გვერდი
       </h1>
       <section className="relative w-[688px] flex items-center gap-[45px] rounded-[10px] border border-[#dee2e6]">
         <div
-          className="w-[199px] flex items-center gap-2 py-[10px] pl-[18px]"
+          className="w-[199px] flex items-center gap-2 py-[10px] pl-[18px] cursor-pointer"
           onClick={() => openList("departments")}
         >
-          <span className="text-base text-[#0d0f10] leading-[19px]">
+          <span
+            className={`${
+              useListing.departments ? "text-[#8338EC]" : "text-[#0d0f10]"
+            } text-base  leading-[19px]`}
+          >
             დეპარტამენტი
           </span>
-          <img src="./Icon.png" alt="open" />
+          {useListing.departments ? (
+            <img src="/arrow-up-bw.png" alt="close" />
+          ) : (
+            <img src="./Icon.png" alt="open" />
+          )}
         </div>
         <div
-          className="w-[199px] flex items-center gap-2 py-[10px] pl-[18px]"
+          className="w-[199px] flex items-center gap-2 py-[10px] pl-[18px] cursor-pointer"
           onClick={() => openList("priorities")}
         >
-          <span className="text-base text-[#0d0f10] leading-[19px]">
+          <span
+            className={`${
+              useListing.priorities ? "text-[#8338EC]" : "text-[#0d0f10]"
+            } text-base  leading-[19px]`}
+          >
             პრიორიტეტი
           </span>
-          <img src="./Icon.png" alt="open" />
+          {useListing.priorities ? (
+            <img src="/arrow-up-bw.png" alt="close" />
+          ) : (
+            <img src="./Icon.png" alt="open" />
+          )}
         </div>
         <div
-          className=" w-[199px] flex items-center gap-2 py-[10px] pl-[18px]"
+          className=" w-[199px] flex items-center gap-2 py-[10px] pl-[18px] cursor-pointer"
           onClick={() => openList("employees")}
         >
-          <span className="text-base text-[#0d0f10] leading-[19px]">
+          <span
+            className={`${
+              useListing.employees ? "text-[#8338EC]" : "text-[#0d0f10]"
+            } text-base  leading-[19px]`}
+          >
             თანამშრომელი
           </span>
-          <img src="./Icon.png" alt="open" />
+          {useListing.employees ? (
+            <img src="/arrow-up-bw.png" alt="close" />
+          ) : (
+            <img src="./Icon.png" alt="open" />
+          )}
         </div>
         <section
           className={`${
@@ -248,7 +290,7 @@ function Home() {
                       chosenSection == "departments"
                         ? "border-[#212529]"
                         : "border-[#8338ec]"
-                    } outline-none w-[22px] h-[22px] flex items-center justify-center rounded-[6px] border-[1.5px] `}
+                    } outline-none w-[22px] h-[22px] flex items-center justify-center rounded-[6px] border-[1.5px] cursor-pointer`}
                     onClick={() => handleFilter(chosenSection, e.id)}
                   >
                     {chosenSection == "departments" &&
