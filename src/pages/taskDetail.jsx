@@ -90,9 +90,9 @@ function TaskDetail() {
   console.log(date);
 
   return (
-    <main className="flex justify-between">
+    <main className="flex">
       {useTask ? (
-        <div>
+        <div className="w-full flex justify-between">
           <section className="w-[715px] flex flex-col gap-[73px]">
             <section className="flex flex-col gap-[26px]">
               <div className="flex flex-col gap-3">
@@ -244,7 +244,29 @@ function TaskDetail() {
               </section>
             </section>
           </section>
-          <section></section>
+          <section className="w-[741px] flex flex-col gap-[66px] rounded-[10px] border-[0.3px] border-[#ddd2ff] px-[45px] pt-10 pb-[52px] commentsBg">
+            <div className="w-[651px] flex flex-col items-end rounded-[10px] border-[0.3px] border-[#adb5bd] bg-[#fff] px-5 pt-[18px] pb-[15px]">
+              <textarea
+                name=""
+                id=""
+                placeholder="დაწერე კომენტარი"
+                className="w-full h-[85px] outline-none resize-none pb-2 placeholder:text-sm placeholder:text-[#898989] placeholder:leading-[17px] text-sm text-[#0D0F10] leading-[17px]"
+              />
+              <button className="w-[153px] h-[35px] flex items-center justify-center rounded-[20px] bg-[#8338ec] hover:bg-[#B588F4] text-base text-[#fff] leading-[19px] cursor-pointer">
+                დააკომენტარე
+              </button>
+            </div>
+            <div className="flex flex-col gap-10">
+              <div className="flex items-center gap-[7px]">
+                <h4 className="text-[20px] text-[#000] leading-[24px] font-500">
+                  {" "}
+                  კომენტარები
+                </h4>
+                <div className="w-[30px] h-[22px] flex items-center justify-center rounded-[30px] bg-[#8338ec] text-sm text-[#fff] leading-[17px] font-semibold"></div>
+              </div>
+              <div></div>
+            </div>
+          </section>
         </div>
       ) : (
         "loadinnnngggg"

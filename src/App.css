@@ -119,3 +119,7 @@ header {
   line-height: 1.43;
   cursor: pointer;
 }
+
+.commentsBg {
+  background-color: rgba(248, 243, 254, 0.65);
+}
