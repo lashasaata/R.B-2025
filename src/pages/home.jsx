@@ -1,7 +1,9 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 function Home() {
+  const navigate = useNavigate();
   const [useData, setData] = useState({
     departments: [],
     priorities: [],
@@ -427,7 +429,8 @@ function Home() {
             return (
               <section
                 key={e.id}
-                className="w-[381px] min-h-[202px] flex flex-col justify-between gap-7 p-5 rounded-[15px] border border-[#f7bc30] bg-[#fff]"
+                className="w-[381px] min-h-[202px] flex flex-col justify-between gap-7 p-5 rounded-[15px] border border-[#f7bc30] bg-[#fff] cursor-pointer"
+                onClick={() => navigate(`/tasks/${e.id}`)}
               >
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-[10px]">
@@ -567,7 +570,8 @@ function Home() {
             return (
               <section
                 key={e.id}
-                className="w-[381px] min-h-[202px] flex flex-col justify-between gap-7 p-5 rounded-[15px] border border-[#fb5607] bg-[#fff]"
+                className="w-[381px] min-h-[202px] flex flex-col justify-between gap-7 p-5 rounded-[15px] border border-[#fb5607] bg-[#fff] cursor-pointer"
+                onClick={() => navigate(`/tasks/${e.id}`)}
               >
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-[10px]">
@@ -707,7 +711,8 @@ function Home() {
             return (
               <section
                 key={e.id}
-                className="w-[381px] min-h-[202px] flex flex-col justify-between gap-7 p-5 rounded-[15px] border border-[#ff006e] bg-[#fff]"
+                className="w-[381px] min-h-[202px] flex flex-col justify-between gap-7 p-5 rounded-[15px] border border-[#ff006e] bg-[#fff] cursor-pointer"
+                onClick={() => navigate(`/tasks/${e.id}`)}
               >
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-[10px]">
@@ -847,7 +852,8 @@ function Home() {
             return (
               <section
                 key={e.id}
-                className="w-[381px] min-h-[202px] flex flex-col justify-between gap-7 p-5 rounded-[15px] border border-[#3a86ff] bg-[#fff]"
+                className="w-[381px] min-h-[202px] flex flex-col justify-between gap-7 p-5 rounded-[15px] border border-[#3a86ff] bg-[#fff] cursor-pointer"
+                onClick={() => navigate(`/tasks/${e.id}`)}
               >
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-[10px]">
