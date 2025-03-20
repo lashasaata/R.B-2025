@@ -74,10 +74,11 @@ function Home() {
     completed: [],
   });
 
-  useEffect(() => {
-    apply();
-  }, [useData.tasks]);
-
+  const [filterBoxes, setFilterBoxes] = useState({
+    departments: [],
+    priorities: [],
+    employees: [],
+  });
   const [chosenBoxes, setChosenBoxes] = useState({
     departments: [],
     priorities: [],
@@ -88,6 +89,10 @@ function Home() {
     priorities: [],
     employees: [],
   });
+
+  useEffect(() => {
+    apply(selectedBoxes);
+  }, [useData.tasks]);
 
   const handleFilter = (field, id) => {
     if (selectedBoxes[field].includes(id)) {
@@ -117,8 +122,8 @@ function Home() {
     }
   };
 
-  const apply = () => {
-    let idsForFilter = structuredClone(selectedBoxes);
+  const apply = (boxes) => {
+    let idsForFilter = structuredClone(boxes);
 
     Object.entries(idsForFilter).forEach(([key, value]) => {
       if (value.length === 0) {
@@ -162,8 +167,28 @@ function Home() {
       }
     });
 
-    setChosenBoxes(selectedBoxes);
+    setFilterBoxes(boxes);
+    setChosenBoxes(boxes);
     setFilteredData(filterdata);
+  };
+
+  const clearFilter = () => {
+    const reset = {
+      departments: [],
+      priorities: [],
+      employees: [],
+    };
+
+    apply(reset);
+  };
+
+  const deleteBox = (category, elementId) => {
+    let newBoxes = {
+      ...filterBoxes,
+      [category]: filterBoxes[category].filter((id) => id !== elementId),
+    };
+
+    apply(newBoxes);
   };
 
   return (
@@ -257,13 +282,48 @@ function Home() {
           </div>
           <button
             className="flex items-center justify-center self-end w-[155px] h-[35px] rounded-[20px] bg-[#8338ec] text-base text-[#fff] leading-[19px] cursor-pointer hover:bg-[#B588F4]"
-            onClick={apply}
+            onClick={() => apply(selectedBoxes)}
           >
             არჩევა
           </button>
         </section>
       </section>
-      <section className="flex gap-[52px]">
+      <section className="flex items-center flex-wrap gap-2 ml-[2px] mt-[-28px]">
+        {Object.entries(filterBoxes).map(([category, selectedIds]) => {
+          return selectedIds.map((id) => {
+            const obj = useData[category]?.find((item) => item.id === id);
+
+            if (!obj) return null;
+
+            return (
+              <div
+                key={id}
+                className="flex items-center gap-1 px-[10px] py-[5px] border border-[#ced4da] rounded-[43px]"
+              >
+                <span className="text-sm text-[#343a40] leading-[17px]">
+                  {category === "employees"
+                    ? obj.name + " " + obj.surname
+                    : obj.name}
+                </span>
+                <img
+                  src="x.png"
+                  alt="delete"
+                  className="cursor-pointer"
+                  onClick={() => deleteBox(category, id)}
+                />
+              </div>
+            );
+          });
+        })}
+        <div
+          className="h-[26px] flex items-center gap-1 px-[10px] py-[5px] rounded-[43px] text-sm text-[#343a40] leading-[17px] cursor-pointer"
+          onClick={clearFilter}
+        >
+          {Object.values(filterBoxes).some((e) => e.length > 0) &&
+            "გასუფთავება"}
+        </div>
+      </section>
+      <section className="flex gap-[52px] mt-[-26px]">
         <section className="flex flex-col gap-[30px]">
           <header className="w-[381px] h-[54px] flex items-center justify-center rounded-[10px] bg-[#f7bc30] text-[20px] text-[#fff] leading-[24px] font-500 cursor-pointer">
             დასაწყები
@@ -313,21 +373,23 @@ function Home() {
 
             const formattedDate = `${day} ${month}, ${year}`;
 
-            const title = e.name;
+            let title = e.name;
             if (title.length > 50) {
               title = title.slice(0, 50) + "...";
             }
 
-            const description = e.description;
+            let description = e.description;
             if (title.length > 100) {
               title = title.slice(0, 100) + "...";
             }
             return (
-              <section className="w-[381px] min-h-[202px] flex flex-col justify-between gap-7 p-5 rounded-[15px] border border-[#f7bc30] bg-[#fff]">
+              <section
+                key={e.id}
+                className="w-[381px] min-h-[202px] flex flex-col justify-between gap-7 p-5 rounded-[15px] border border-[#f7bc30] bg-[#fff]"
+              >
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-[10px]">
                     <div
-                      key={e.id}
                       className={`${
                         e.priority.name == "დაბალი"
                           ? "border-[#08a508]"
@@ -451,21 +513,23 @@ function Home() {
 
             const formattedDate = `${day} ${month}, ${year}`;
 
-            const title = e.name;
+            let title = e.name;
             if (title.length > 50) {
               title = title.slice(0, 50) + "...";
             }
 
-            const description = e.description;
+            let description = e.description;
             if (title.length > 100) {
               title = title.slice(0, 100) + "...";
             }
             return (
-              <section className="w-[381px] min-h-[202px] flex flex-col justify-between gap-7 p-5 rounded-[15px] border border-[#fb5607] bg-[#fff]">
+              <section
+                key={e.id}
+                className="w-[381px] min-h-[202px] flex flex-col justify-between gap-7 p-5 rounded-[15px] border border-[#fb5607] bg-[#fff]"
+              >
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-[10px]">
                     <div
-                      key={e.id}
                       className={`${
                         e.priority.name == "დაბალი"
                           ? "border-[#08a508]"
@@ -589,21 +653,23 @@ function Home() {
 
             const formattedDate = `${day} ${month}, ${year}`;
 
-            const title = e.name;
+            let title = e.name;
             if (title.length > 50) {
               title = title.slice(0, 50) + "...";
             }
 
-            const description = e.description;
+            let description = e.description;
             if (title.length > 100) {
               title = title.slice(0, 100) + "...";
             }
             return (
-              <section className="w-[381px] min-h-[202px] flex flex-col justify-between gap-7 p-5 rounded-[15px] border border-[#ff006e] bg-[#fff]">
+              <section
+                key={e.id}
+                className="w-[381px] min-h-[202px] flex flex-col justify-between gap-7 p-5 rounded-[15px] border border-[#ff006e] bg-[#fff]"
+              >
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-[10px]">
                     <div
-                      key={e.id}
                       className={`${
                         e.priority.name == "დაბალი"
                           ? "border-[#08a508]"
@@ -727,21 +793,23 @@ function Home() {
 
             const formattedDate = `${day} ${month}, ${year}`;
 
-            const title = e.name;
+            let title = e.name;
             if (title.length > 50) {
               title = title.slice(0, 50) + "...";
             }
 
-            const description = e.description;
+            let description = e.description;
             if (title.length > 100) {
               title = title.slice(0, 100) + "...";
             }
             return (
-              <section className="w-[381px] min-h-[202px] flex flex-col justify-between gap-7 p-5 rounded-[15px] border border-[#3a86ff] bg-[#fff]">
+              <section
+                key={e.id}
+                className="w-[381px] min-h-[202px] flex flex-col justify-between gap-7 p-5 rounded-[15px] border border-[#3a86ff] bg-[#fff]"
+              >
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-[10px]">
                     <div
-                      key={e.id}
                       className={`${
                         e.priority.name == "დაბალი"
                           ? "border-[#08a508]"
