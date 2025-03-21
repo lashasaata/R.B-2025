@@ -1,3 +1,5 @@
+// THE COMPONENT IS NOT IN USE AT THE MOMENT
+
 import { createContext, useState, useEffect } from "react";
 import axios from "axios";
 

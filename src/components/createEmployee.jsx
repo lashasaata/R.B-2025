@@ -52,7 +52,6 @@ function CreateEmployee(props) {
       try {
         const departments = await axios.get(depUrl);
         setDepartments(departments.data);
-        console.log(departments.data);
       } catch (error) {
         console.log("Fetching error:", error);
       }
@@ -79,8 +78,6 @@ function CreateEmployee(props) {
     formData.append("avatar", fileA);
     formData.append("department_id", depId);
 
-    formData.forEach((key, value) => console.log(key, value));
-
     const postData = async () => {
       try {
         const response = await axios.post(emplUrl, formData, {
@@ -99,8 +96,6 @@ function CreateEmployee(props) {
   };
 
   const inputs = watch();
-  console.log(inputs);
-  console.log(errors);
 
   const handleFileA = (e) => {
     const selectedFile = e.target.files[0];
@@ -116,7 +111,6 @@ function CreateEmployee(props) {
     if (url) {
       setFileAUrl(url);
     }
-    console.log(e.target.value);
     setValue("avatar", selectedFile, { shouldValidate: true });
   };
 

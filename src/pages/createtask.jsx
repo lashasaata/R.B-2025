@@ -67,8 +67,6 @@ function CreateTask(props) {
     fetchData();
   }, [props.useSlicer]);
 
-  console.log(useData);
-
   const {
     register,
     handleSubmit,
@@ -100,8 +98,6 @@ function CreateTask(props) {
   useEffect(() => {
     saveFormData(getValues());
   }, [inputs]);
-
-  console.log(localStorage);
 
   const [listings, setListings] = useState({
     status: false,
@@ -195,7 +191,6 @@ function CreateTask(props) {
     }));
   };
 
-  console.log(listings);
   let today = new Date();
   const [dateValue, setDateValue] = useState("");
   // const storedDate = localStorage.getItem("date");
@@ -328,7 +323,6 @@ function CreateTask(props) {
   };
 
   const handleErrors = () => {
-    console.log(isSubmited);
     if (!isSubmited) {
       setSubmited(true);
     }

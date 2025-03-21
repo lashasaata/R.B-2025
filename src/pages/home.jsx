@@ -50,9 +50,6 @@ function Home() {
     fetchData();
   }, []);
 
-  console.log(useData);
-  console.log(useListing);
-
   // FINDS which filter section is open
   const findKeyByValue = (obj, value = true) => {
     return Object.keys(obj).find((key) => obj[key] === value);
@@ -69,23 +66,32 @@ function Home() {
     setSelectedBoxes(chosenBoxes);
   };
 
-  const [filteredData, setFilteredData] = useState({
-    toDos: [],
-    inProgress: [],
-    forTesting: [],
-    completed: [],
-  });
+  const selected = JSON.parse(localStorage.getItem("selected"))
+    ? JSON.parse(localStorage.getItem("selected"))
+    : {
+        departments: [],
+        priorities: [],
+        employees: [],
+      };
+  const chosen = JSON.parse(localStorage.getItem("choosen"))
+    ? JSON.parse(localStorage.getItem("choosen"))
+    : {
+        departments: [],
+        priorities: [],
+        employees: [],
+      };
+  const filter = JSON.parse(localStorage.getItem("filter"))
+    ? JSON.parse(localStorage.getItem("filter"))
+    : {
+        departments: [],
+        priorities: [],
+        employees: [],
+      };
 
-  const [filterBoxes, setFilterBoxes] = useState({
-    departments: [],
-    priorities: [],
-    employees: [],
-  });
-  const [chosenBoxes, setChosenBoxes] = useState({
-    departments: [],
-    priorities: [],
-    employees: [],
-  });
+  const [filteredData, setFilteredData] = useState(selected);
+
+  const [filterBoxes, setFilterBoxes] = useState(chosen);
+  const [chosenBoxes, setChosenBoxes] = useState(filter);
   const [selectedBoxes, setSelectedBoxes] = useState({
     departments: [],
     priorities: [],
@@ -169,6 +175,10 @@ function Home() {
       }
     });
 
+    localStorage.setItem("selected", JSON.stringify(boxes));
+    localStorage.setItem("choosen", JSON.stringify(boxes));
+    localStorage.setItem("filter", JSON.stringify(boxes));
+
     setFilterBoxes(boxes);
     setChosenBoxes(boxes);
     setFilteredData(filterdata);
@@ -186,6 +196,9 @@ function Home() {
       employees: [],
     };
 
+    localStorage.removeItem("selected");
+    localStorage.removeItem("choosen");
+    localStorage.removeItem("filter");
     apply(reset);
   };
 
@@ -209,10 +222,7 @@ function Home() {
   // };
 
   return (
-    <main
-      className="flex flex-col gap-[52px]"
-      // onClick={closeLists}
-    >
+    <main className="flex flex-col gap-[52px] z-30">
       <h1 className="text-[34px] text-[#212529] font-[600] leading-[41px]">
         დავალებების გვერდი
       </h1>
@@ -278,7 +288,6 @@ function Home() {
           <div className="flex flex-col gap-[22px]">
             {useData[findKeyByValue(useListing, true)]?.map((e) => {
               let chosenSection = findKeyByValue(useListing);
-              console.log(e.id);
               return (
                 <div key={e.id} className="flex items-center gap-[15px]">
                   <input
@@ -372,7 +381,7 @@ function Home() {
           <header className="w-[381px] h-[54px] flex items-center justify-center rounded-[10px] bg-[#f7bc30] text-[20px] text-[#fff] leading-[24px] font-500 cursor-pointer">
             დასაწყები
           </header>
-          {filteredData.toDos.map((e) => {
+          {filteredData.toDos?.map((e) => {
             let department = e.department.name;
             department = department.split(" ");
 
@@ -513,7 +522,7 @@ function Home() {
           <header className="w-[381px] h-[54px] flex items-center justify-center rounded-[10px] bg-[#fb5607] text-[20px] text-[#fff] leading-[24px] font-500 cursor-pointer">
             პროგრესში
           </header>
-          {filteredData.inProgress.map((e) => {
+          {filteredData.inProgress?.map((e) => {
             let department = e.department.name;
             department = department.split(" ");
 
@@ -654,7 +663,7 @@ function Home() {
           <header className="w-[381px] h-[54px] flex items-center justify-center rounded-[10px] bg-[#ff006e] text-[20px] text-[#fff] leading-[24px] font-500 cursor-pointer">
             მზად ტესტირებისთვის
           </header>
-          {filteredData.forTesting.map((e) => {
+          {filteredData.forTesting?.map((e) => {
             let department = e.department.name;
             department = department.split(" ");
 
@@ -795,7 +804,7 @@ function Home() {
           <header className="w-[381px] h-[54px] flex items-center justify-center rounded-[10px] bg-[#3a86ff] text-[20px] text-[#fff] leading-[24px] font-500 cursor-pointer">
             დასრულებული
           </header>
-          {filteredData.completed.map((e) => {
+          {filteredData.completed?.map((e) => {
             let department = e.department.name;
             department = department.split(" ");
 

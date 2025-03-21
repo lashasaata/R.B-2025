@@ -1,14 +1,18 @@
 import axios from "axios";
 import { useEffect, useState, useRef } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { useContext } from "react";
 import { TaskContext } from "../context/TaskProvider";
 
 function TaskDetail() {
-  const data = useContext(TaskContext);
+  //   const data = useContext(TaskContext);
+  const API_URL = "https://momentum.redberryinternship.ge/api";
+  const TOKEN = "9e6c9438-0bca-4337-a267-f9a7fd99f68b";
+
+  const apiUrl = (endpoint) => `${API_URL}${endpoint}`;
+
   const { taskId } = useParams();
   const safeTaskId = taskId || "";
-  const navigate = useNavigate();
 
   const [useTask, setTask] = useState(null);
   const [statuses, setStatuses] = useState([]);
@@ -18,17 +22,15 @@ function TaskDetail() {
   });
   const [status, openStatus] = useState(false);
 
-  console.log(useTask);
-
   useEffect(() => {
     const fetchTask = async () => {
       try {
-        const taskResponse = await axios.get(data.apiUrl(`/tasks/${taskId}`), {
+        const taskResponse = await axios.get(apiUrl(`/tasks/${taskId}`), {
           headers: {
-            Authorization: `Bearer ${data.TOKEN}`,
+            Authorization: `Bearer ${TOKEN}`,
           },
         });
-        const statusesResponse = await axios.get(data.apiUrl(`/statuses`));
+        const statusesResponse = await axios.get(apiUrl(`/statuses`));
         setStatuses(statusesResponse.data);
         setUseStatus({
           status_id: taskResponse.data.status.id,
@@ -45,17 +47,16 @@ function TaskDetail() {
     const putStatus = async () => {
       try {
         const statusResponse = await axios.put(
-          data.apiUrl(`/tasks/${taskId}`),
+          apiUrl(`/tasks/${taskId}`),
           {
             status_id: useStatus.status_id,
           },
           {
             headers: {
-              Authorization: `Bearer ${data.TOKEN}`,
+              Authorization: `Bearer ${TOKEN}`,
             },
           }
         );
-        console.log(statusResponse);
       } catch (error) {
         console.log("Failed posting status:", error);
       }
@@ -82,8 +83,6 @@ function TaskDetail() {
     openStatus(false);
   };
 
-  console.log(comments);
-
   const date = new Date(useTask?.due_date);
 
   const georgianDays = ["ორშ", "სამ", "ოთხ", "ხუთ", "პარ", "შაბ", "კვი"];
@@ -96,8 +95,6 @@ function TaskDetail() {
   const formattedDate = `${georgianDays[weekDay - 1]} - ${day}/${
     month + 1
   }/${year}`;
-
-  console.log(date);
 
   const [isError, setError] = useState({});
 
@@ -122,22 +119,20 @@ function TaskDetail() {
       ...prevReplies,
       [id]: event.target.value,
     }));
-    console.log(event.target.value, id);
   };
 
   useEffect(() => {
     const fetchComments = async () => {
       try {
         const commentsResponse = await axios.get(
-          data.apiUrl(`/tasks/${taskId}/comments`),
+          apiUrl(`/tasks/${taskId}/comments`),
           {
             headers: {
-              Authorization: `Bearer ${data.TOKEN}`,
+              Authorization: `Bearer ${TOKEN}`,
             },
           }
         );
         setComments(commentsResponse.data);
-        console.log(commentsResponse);
       } catch (error) {
         console.log("Failed posting status:", error);
       }
@@ -154,14 +149,14 @@ function TaskDetail() {
     if (trimed.length > 0) {
       try {
         const commentResponse = await axios.post(
-          data.apiUrl(`/tasks/${taskId}/comments`),
+          apiUrl(`/tasks/${taskId}/comments`),
           {
             text: trimed,
             parent_id: idF,
           },
           {
             headers: {
-              Authorization: `Bearer ${data.TOKEN}`,
+              Authorization: `Bearer ${TOKEN}`,
             },
           }
         );
@@ -188,7 +183,6 @@ function TaskDetail() {
         setReplies({
           parent: "",
         });
-        console.log(commentResponse);
       } catch (error) {
         console.log("Filed posting comment:", error);
       }
@@ -200,8 +194,6 @@ function TaskDetail() {
         [id]: true,
       });
     }
-
-    console.log("Comment:", trimed);
   };
 
   const [isHovered, setHovered] = useState();
