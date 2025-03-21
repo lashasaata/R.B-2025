@@ -1,5 +1,5 @@
 import axios from "axios";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useContext } from "react";
 import { TaskContext } from "../context/TaskProvider";
@@ -64,6 +64,16 @@ function TaskDetail() {
     putStatus();
   }, [useStatus]);
 
+  const [comments, setComments] = useState([]);
+
+  const getCommentsA = () => {
+    let amount = 0;
+    comments.map((e) => {
+      amount += e.sub_comments?.length + 1;
+    });
+    return amount;
+  };
+
   const handleStatus = (name, id) => {
     setUseStatus({
       name: name,
@@ -72,7 +82,7 @@ function TaskDetail() {
     openStatus(false);
   };
 
-  console.log(useTask);
+  console.log(comments);
 
   const date = new Date(useTask?.due_date);
 
@@ -89,10 +99,125 @@ function TaskDetail() {
 
   console.log(date);
 
+  const [isError, setError] = useState({});
+
+  const [subComs, setSubComs] = useState();
+  const [replies, setReplies] = useState({
+    parent: "",
+  });
+
+  const handleSubComs = (id) => {
+    if (subComs == id) {
+      setSubComs(null);
+    } else {
+      setSubComs(id);
+      setReplies({
+        parent: "",
+      });
+    }
+  };
+
+  const changeReply = (event, id) => {
+    setReplies((prevReplies) => ({
+      ...prevReplies,
+      [id]: event.target.value,
+    }));
+    console.log(event.target.value, id);
+  };
+
+  useEffect(() => {
+    const fetchComments = async () => {
+      try {
+        const commentsResponse = await axios.get(
+          data.apiUrl(`/tasks/${taskId}/comments`),
+          {
+            headers: {
+              Authorization: `Bearer ${data.TOKEN}`,
+            },
+          }
+        );
+        setComments(commentsResponse.data);
+        console.log(commentsResponse);
+      } catch (error) {
+        console.log("Failed posting status:", error);
+      }
+    };
+
+    fetchComments();
+  }, [isError]);
+
+  const handleComment = async (id = null) => {
+    const commentValue = replies[id] ? replies[id] : "";
+    const trimed = commentValue.trim();
+    const idF = id == "parent" ? null : id;
+
+    if (trimed.length > 0) {
+      try {
+        const commentResponse = await axios.post(
+          data.apiUrl(`/tasks/${taskId}/comments`),
+          {
+            text: trimed,
+            parent_id: idF,
+          },
+          {
+            headers: {
+              Authorization: `Bearer ${data.TOKEN}`,
+            },
+          }
+        );
+
+        if (id == "parent") {
+          setComments([commentResponse.data, ...comments]);
+          setSubComs(null);
+        } else {
+          setComments((prevComments) =>
+            prevComments.map((comment) =>
+              comment.id === id
+                ? {
+                    ...comment,
+                    sub_comments: [
+                      ...comment.sub_comments,
+                      commentResponse.data,
+                    ],
+                  }
+                : comment
+            )
+          );
+          handleSubComs(id);
+        }
+        setReplies({
+          parent: "",
+        });
+        console.log(commentResponse);
+      } catch (error) {
+        console.log("Filed posting comment:", error);
+      }
+      setError({
+        [id]: false,
+      });
+    } else {
+      setError({
+        [id]: true,
+      });
+    }
+
+    console.log("Comment:", trimed);
+  };
+
+  const [isHovered, setHovered] = useState();
+
+  const handleHover = (id) => {
+    if (isHovered) {
+      setHovered(null);
+    } else {
+      setHovered(id);
+    }
+  };
+
   return (
     <main className="flex">
       {useTask ? (
-        <div className="w-full flex justify-between">
+        <div className="w-full flex justify-between mb-20">
           <section className="w-[715px] flex flex-col gap-[73px]">
             <section className="flex flex-col gap-[26px]">
               <div className="flex flex-col gap-3">
@@ -245,26 +370,131 @@ function TaskDetail() {
             </section>
           </section>
           <section className="w-[741px] flex flex-col gap-[66px] rounded-[10px] border-[0.3px] border-[#ddd2ff] px-[45px] pt-10 pb-[52px] commentsBg">
-            <div className="w-[651px] flex flex-col items-end rounded-[10px] border-[0.3px] border-[#adb5bd] bg-[#fff] px-5 pt-[18px] pb-[15px]">
+            <div
+              className={`${
+                isError.parent ? "border-[#F93B1D]" : "border-[#adb5bd]"
+              } w-[651px] flex flex-col items-end rounded-[10px] border-[0.3px] bg-[#fff] px-5 pt-[18px] pb-[15px]`}
+            >
               <textarea
-                name=""
-                id=""
+                name="comment"
+                id="parent"
+                value={replies.parent}
+                onChange={(e) => changeReply(e, "parent")}
                 placeholder="დაწერე კომენტარი"
                 className="w-full h-[85px] outline-none resize-none pb-2 placeholder:text-sm placeholder:text-[#898989] placeholder:leading-[17px] text-sm text-[#0D0F10] leading-[17px]"
               />
-              <button className="w-[153px] h-[35px] flex items-center justify-center rounded-[20px] bg-[#8338ec] hover:bg-[#B588F4] text-base text-[#fff] leading-[19px] cursor-pointer">
+              <button
+                onClick={() => handleComment("parent")}
+                className="w-[153px] h-[35px] flex items-center justify-center rounded-[20px] bg-[#8338ec] hover:bg-[#B588F4] text-base text-[#fff] leading-[19px] cursor-pointer"
+              >
                 დააკომენტარე
               </button>
             </div>
             <div className="flex flex-col gap-10">
               <div className="flex items-center gap-[7px]">
                 <h4 className="text-[20px] text-[#000] leading-[24px] font-500">
-                  {" "}
                   კომენტარები
                 </h4>
-                <div className="w-[30px] h-[22px] flex items-center justify-center rounded-[30px] bg-[#8338ec] text-sm text-[#fff] leading-[17px] font-semibold"></div>
+                <div className="w-[30px] h-[22px] flex items-center justify-center rounded-[30px] bg-[#8338ec] text-sm text-[#fff] leading-[17px] font-semibold">
+                  {getCommentsA()}
+                </div>
               </div>
-              <div></div>
+              <div className="flex flex-col gap-[38px]">
+                {comments.map((element) => {
+                  return (
+                    <section key={element.id} className="flex flex-col gap-5">
+                      <div className="flex gap-3 pr-[53px]">
+                        <div>
+                          <img
+                            src={element.author_avatar}
+                            alt="avatar"
+                            className="w-[38px] h-[38px] rounded-[40px]"
+                          />
+                        </div>
+                        <div className="flex flex-col gap-2">
+                          <span className="text-lg text-[#212529] leading-[21px] font-500">
+                            {element.author_nickname}
+                          </span>
+                          <p className="w-[548px] text-base text-[#343a40] leading-[19px]">
+                            {element.text}
+                          </p>
+                          <div
+                            className="flex items-center gap-[6px] py-[5px] mt-[2px] cursor-pointer"
+                            onMouseEnter={() => handleHover(element.id)}
+                            onMouseLeave={() => handleHover(element.id)}
+                            onClick={() => handleSubComs(element.id)}
+                          >
+                            <img
+                              src={
+                                isHovered == element.id
+                                  ? "/Left 2 (1).png"
+                                  : "/Left 2.png"
+                              }
+                              alt="reply"
+                            />
+                            <span
+                              className={`${
+                                isHovered == element.id
+                                  ? "text-[#B588F4]"
+                                  : "text-[#8338ec]"
+                              } text-xs leading-[14px]`}
+                            >
+                              უპასუხე
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                      {subComs == element.id ? (
+                        <div
+                          className={`${
+                            isError[element.id]
+                              ? "border-[#F93B1D]"
+                              : "border-[#adb5bd]"
+                          } w-[651px] flex flex-col items-end rounded-[10px] border-[0.3px] bg-[#fff] px-5 pt-[18px] pb-[15px]`}
+                        >
+                          <textarea
+                            onChange={(e) => changeReply(e, element.id)}
+                            name="comment"
+                            id=""
+                            value={replies[element.id]}
+                            placeholder="დაწერე კომენტარი"
+                            className="w-full h-[55px] outline-none resize-none pb-2 placeholder:text-sm placeholder:text-[#898989] placeholder:leading-[17px] text-sm text-[#0D0F10] leading-[17px]"
+                          />
+                          <button
+                            onClick={() => handleComment(element.id)}
+                            className="w-[153px] h-[35px] flex items-center justify-center rounded-[20px] bg-[#8338ec] hover:bg-[#B588F4] text-base text-[#fff] leading-[19px] cursor-pointer"
+                          >
+                            დააკომენტარე
+                          </button>
+                        </div>
+                      ) : (
+                        ""
+                      )}
+                      {element.sub_comments?.map((sub) => {
+                        return (
+                          <div key={sub.id} className="flex gap-3 pl-[53px]">
+                            <div>
+                              <img
+                                src={sub.author_avatar}
+                                alt="avatar"
+                                className="w-[38px] h-[38px] rounded-[40px]"
+                              />
+                            </div>
+                            <div className="flex flex-col gap-2">
+                              <span className="text-lg text-[#212529] leading-[21px] font-500">
+                                {sub.author_nickname}
+                              </span>
+                              <p className="w-[548px] text-base text-[#343a40] leading-[19px]">
+                                {sub.text}
+                              </p>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </section>
+                  );
+                })}
+              </div>
             </div>
           </section>
         </div>
