@@ -77,7 +77,9 @@ function CreateEmployee(props) {
     formData.append("name", data.name);
     formData.append("surname", data.surname);
     formData.append("avatar", fileA);
-    formData.append("name", depId);
+    formData.append("department_id", depId);
+
+    formData.forEach((key, value) => console.log(key, value));
 
     const postData = async () => {
       try {
@@ -88,12 +90,12 @@ function CreateEmployee(props) {
             "Content-Type": "multipart/form-data",
           },
         });
+        props.setSlicer(false);
       } catch (error) {
         console.log("Error posting data:", error);
       }
     };
     postData();
-    props.setSlicer(false);
   };
 
   const inputs = watch();
@@ -102,30 +104,14 @@ function CreateEmployee(props) {
 
   const handleFileA = (e) => {
     const selectedFile = e.target.files[0];
-    e.preventDefault();
+    if (!selectedFile) return;
 
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      setFileA(reader.result);
-    };
+    setFileA(selectedFile);
+    setFileAUrl(URL.createObjectURL(selectedFile));
+    setValue("avatar", selectedFile, { shouldValidate: true });
 
     reader.readAsDataURL(selectedFile);
 
-    // reader.readAsText(file);
-    // const reader = new FileReader();
-    // reader.onload = (event) => {
-    //   console.log("File Contents (Base64):", event.target.result); // Base64 string of the image
-    //   // If it's an image, extract EXIF metadata
-    //   const img = new Image();
-    //   img.src = event.target.result;
-    //   img.onload = () => {
-    //     EXIF.getData(img, function () {
-    //       const exifData = EXIF.getAllTags(this);
-    //       setFileA(exifData);
-    //       console.log("EXIF Metadata:", exifData); // EXIF metadata (camera info, resolution, etc.)
-    //     });
-    //   };
-    // };
     const url = URL.createObjectURL(selectedFile);
     if (url) {
       setFileAUrl(url);
@@ -140,7 +126,7 @@ function CreateEmployee(props) {
     setValue("avatar", "", { shouldValidate: false });
   };
 
-  const [selected, setSelected] = useState(departments[0]);
+  const [selected, setSelected] = useState(null);
 
   const handleChange = (e) => {
     setSelected(e);
@@ -150,11 +136,12 @@ function CreateEmployee(props) {
   const [isOpen, setOpen] = useState(false);
 
   return (
-    <div
-      // onClick={() => props.setSlicer(false)}
-      className="fixed bg-black inset-0 backdrop-blur-[5px]"
-    >
-      <main className="w-[913px] rounded-[10px] bg-[#fff] flex flex-col gap-[37px] mt-[118px] ml-[580px] px-[50px] pt-10 pb-15">
+    <div className="fixed inset-0 z-50 overflow-y-auto">
+      <div
+        className="absolute inset-0 blur"
+        onClick={() => props.setSlicer(false)}
+      ></div>
+      <main className="relative w-[913px] rounded-[10px] bg-[#fff] flex flex-col gap-[37px] mt-[118px] ml-[580px] px-[50px] pt-10 pb-15">
         <div className="flex justify-end">
           <div>
             <img
@@ -271,7 +258,7 @@ function CreateEmployee(props) {
                             : "text-[#45A849]"
                         } form2spans`}
                       >
-                        მინიმუმ 255 სიმბოლო
+                        მაქსიმუმ 255 სიმბოლო
                       </span>
                     </p>
                   </div>
@@ -374,7 +361,7 @@ function CreateEmployee(props) {
                             : "text-[#45A849]"
                         } form2spans`}
                       >
-                        მინიმუმ 255 სიმბოლო
+                        მაქსიმუმ 255 სიმბოლო
                       </span>
                     </p>
                   </div>

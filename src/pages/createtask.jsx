@@ -74,13 +74,34 @@ function CreateTask(props) {
     handleSubmit,
     watch,
     setValue,
+    getValues,
     formState: { errors },
   } = useForm({
     resolver: yupResolver(schema),
+    defaultValues: JSON.parse(localStorage.getItem("taskFormData")) || {
+      name: "",
+      description: "",
+      priority_id: "",
+      status_id: "",
+      department_id: "",
+      employee_id: "",
+      due_date: "",
+    },
   });
 
   const inputs = watch();
-  console.log(inputs, errors);
+
+  // Function to update localStorage
+  const saveFormData = (data) => {
+    localStorage.setItem("taskFormData", JSON.stringify(data));
+  };
+
+  // Save visible input values automatically
+  useEffect(() => {
+    saveFormData(getValues());
+  }, [inputs]);
+
+  console.log(localStorage);
 
   const [listings, setListings] = useState({
     status: false,
@@ -108,6 +129,20 @@ function CreateTask(props) {
     }));
   };
 
+  useEffect(() => {
+    const savedIds = JSON.parse(localStorage.getItem("taskIds"));
+    if (savedIds) {
+      setIds(savedIds); // Restore `ids` separately
+    }
+
+    const savedData = JSON.parse(localStorage.getItem("taskFormData"));
+    if (savedData) {
+      Object.keys(savedData).forEach((key) => {
+        setValue(key, savedData[key], { shouldValidate: false });
+      });
+    }
+  }, [setValue]);
+
   const handleLists = (listType, id) => {
     if (listType == "department" && ids.department_id != id) {
       if (isSubmited) {
@@ -120,6 +155,15 @@ function CreateTask(props) {
         employee_id: 0,
         [`${listType}_id`]: id,
       }));
+
+      localStorage.setItem(
+        "taskIds",
+        JSON.stringify({
+          ...ids,
+          employee_id: 0,
+          [`${listType}_id`]: id,
+        })
+      );
     } else {
       setIds((prevIds) => ({
         ...prevIds,
@@ -128,6 +172,13 @@ function CreateTask(props) {
     }
 
     setValue(`${listType}_id`, id, { shouldValidate: true });
+    localStorage.setItem(
+      "taskIds",
+      JSON.stringify({
+        ...ids,
+        [`${listType}_id`]: id,
+      })
+    );
 
     setListings((prevListings) => ({
       ...prevListings,
@@ -147,8 +198,10 @@ function CreateTask(props) {
   console.log(listings);
   let today = new Date();
   const [dateValue, setDateValue] = useState("");
-  const [chosenDate, setChosenDate] = useState(new Date());
+  // const storedDate = localStorage.getItem("date");
+  // const parsedDate = storedDate ? new Date(JSON.parse(storedDate)) : new Date();
 
+  const [chosenDate, setChosenDate] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState(new Date());
   let year = selectedDate.getFullYear();
   let month = selectedDate.getMonth();
@@ -259,6 +312,8 @@ function CreateTask(props) {
     dateValue = date.toISOString().replace("Z", "+04:00");
 
     setValue("due_date", dateValue);
+
+    localStorage.setItem("date", JSON.stringify(dateValue));
   };
 
   const handleCancel = (e) => {
@@ -316,12 +371,15 @@ function CreateTask(props) {
             Accept: "application/json",
           },
         });
+        localStorage.removeItem("taskFormData");
+        localStorage.removeItem("taskIds");
+        localStorage.removeItem("date");
+        navigate("/");
       } catch (error) {
         console.error("Error:", error);
       }
     };
     createTask();
-    navigate("/");
   };
 
   return (
@@ -440,7 +498,7 @@ function CreateTask(props) {
                             ? "https://momentum.redberryinternship.ge/storage/priority-icons/Medium.svg"
                             : useData["priorities"].find(
                                 (e) => ids.priority_id == e.id
-                              ).icon
+                              )?.icon
                         }
                         alt=""
                       />
@@ -449,7 +507,7 @@ function CreateTask(props) {
                           ? "საშუალო"
                           : useData["priorities"].find(
                               (e) => ids.priority_id == e.id
-                            ).name}
+                            )?.name}
                       </span>
                     </div>
                     {listings.priority ? (
@@ -487,7 +545,6 @@ function CreateTask(props) {
                     {...register("priority_id")}
                     type="text"
                     id="inputPriority"
-                    // value={values.region}
                     className="hidden"
                   />
                 </div>
@@ -511,7 +568,7 @@ function CreateTask(props) {
                       {ids.status_id == 0
                         ? "დასაწყები"
                         : useData["statuses"].find((e) => ids.status_id == e.id)
-                            .name}
+                            ?.name}
                     </span>
                     {listings.status ? (
                       <img src="./arrow-up-v.png" alt="" />
@@ -526,30 +583,27 @@ function CreateTask(props) {
                         : "hidden"
                     } absolute w-full bg-[#fff] z-50 left-0 bottom-[1px] transform translate-y-full rounded-b-[5px]`}
                   >
-                    {useData.statuses
-                      .filter((e) => e.name != "დასრულებული")
-                      .map((e) => {
-                        return (
-                          <div
-                            key={e.id}
-                            onClick={() => handleLists("status", e.id)}
-                            className="w-[259px] h-[46px] p-[14px] cursor-pointer"
+                    {useData.statuses.map((e) => {
+                      return (
+                        <div
+                          key={e.id}
+                          onClick={() => handleLists("status", e.id)}
+                          className="w-[259px] h-[46px] p-[14px] cursor-pointer"
+                        >
+                          <span
+                            id={e.id}
+                            className="text-sm text-[#0d0f10] font-[300] leading-[17px] grow"
                           >
-                            <span
-                              id={e.id}
-                              className="text-sm text-[#0d0f10] font-[300] leading-[17px] grow"
-                            >
-                              {e.name}
-                            </span>
-                          </div>
-                        );
-                      })}
+                            {e.name}
+                          </span>
+                        </div>
+                      );
+                    })}
                   </section>
                   <input
                     {...register("status_id")}
                     type="text"
                     id="inputStatus"
-                    // value={values.region}
                     className="hidden"
                   />
                 </div>
@@ -577,7 +631,7 @@ function CreateTask(props) {
                       ? "დიზააინის დეპარტამენტი"
                       : useData["departments"].find(
                           (e) => ids.department_id == e.id
-                        ).name}
+                        )?.name}
                   </span>
                   {listings.department ? (
                     <img src="./arrow-up-v.png" alt="" />
@@ -613,7 +667,6 @@ function CreateTask(props) {
                   {...register("department_id")}
                   type="text"
                   id="inputDepartment"
-                  // value={values.region}
                   className="hidden"
                 />
               </div>
